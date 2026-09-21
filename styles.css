@@ -10,5 +10,5 @@
 @media (max-width:560px){.social-page .brand-context{display:none}.back-link{padding:0 13px;font-size:12px}.social-hero-inner{min-height:360px;padding-block:54px}.social-hero h1{font-size:42px}.social-hero p{font-size:16px}.social-directory{padding:58px 0 70px}.social-section-head{align-items:flex-start;flex-direction:column}.social-card{min-height:170px;grid-template-columns:58px 1fr 34px;gap:14px;padding:22px 18px}.social-icon{width:56px;height:56px;border-radius:17px}.social-copy strong{font-size:22px}.social-copy span{font-size:13px}.social-arrow{width:34px;height:34px}.social-footer .container{align-items:flex-start;flex-direction:column;justify-content:center}}
 .social-card{grid-template-columns:72px 1fr}
 @media (max-width:560px){.social-card{grid-template-columns:58px 1fr}}
-.brand-logo-lockup{position:relative;display:block;width:116px;height:64px;flex:0 0 116px}.brand-logo-lockup .brand-logo-dark{position:absolute;inset:0 auto auto 0}.brand-submark{position:absolute;right:1px;bottom:0;color:var(--blue);font-size:9px;font-weight:800;line-height:1;letter-spacing:.19em;text-transform:uppercase}
-@media (max-width:700px){.brand-logo-lockup{width:96px;height:54px;flex-basis:96px}.brand-submark{right:0;font-size:7.5px;letter-spacing:.17em}}
+.brand-context{max-width:180px}.brand-context span{display:block}.brand-context span:first-child{white-space:nowrap;color:var(--ink)}
+@media (max-width:700px){.brand{gap:10px}.brand-context{max-width:145px;font-size:9px;padding-left:9px}}
