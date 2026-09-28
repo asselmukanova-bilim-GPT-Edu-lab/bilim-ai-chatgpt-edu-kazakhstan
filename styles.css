@@ -107,3 +107,4 @@
 .support-contact-phone{grid-column:1/-1}
 .support-contact-phone .support-contact-icon{background:#f0edff;color:var(--violet)}
 @media (max-width:700px){.support-actions{grid-template-columns:1fr}.support-contact-phone{grid-column:auto}}
+.lang-toggle{min-width:72px;background:#fff;color:var(--ink);cursor:pointer;font-weight:800}.lang-toggle:hover{color:var(--blue);border-color:#9e8fe4}.lang-toggle:focus-visible{outline:3px solid rgba(111,69,255,.2);outline-offset:2px}
