@@ -108,3 +108,32 @@
 .support-contact-phone .support-contact-icon{background:#f0edff;color:var(--violet)}
 @media (max-width:700px){.support-actions{grid-template-columns:1fr}.support-contact-phone{grid-column:auto}}
 .lang-toggle{min-width:72px;background:#fff;color:var(--ink);cursor:pointer;font-weight:800}.lang-toggle:hover{color:var(--blue);border-color:#9e8fe4}.lang-toggle:focus-visible{outline:3px solid rgba(111,69,255,.2);outline-offset:2px}
+
+/* Kazakh typography: full glyph support and calmer wrapping for longer words. */
+body{font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+h1,h2,h3,p,a,button,strong,small,span{word-break:normal;overflow-wrap:normal;hyphens:none}
+h1,h2,h3{text-wrap:balance}p{text-wrap:pretty}
+html[lang="kk"] body,html[lang="kk"] button{font-family:"Noto Sans","Manrope",system-ui,sans-serif}
+html[lang="kk"] .hero h1{font-size:clamp(40px,5vw,68px);line-height:1.09;letter-spacing:-.035em;max-width:790px}
+html[lang="kk"] .about-hero-copy h1{font-size:clamp(40px,4.4vw,60px);line-height:1.09;letter-spacing:-.032em}
+html[lang="kk"] .section-head h2,
+html[lang="kk"] .support-copy h2,
+html[lang="kk"] .community h2,
+html[lang="kk"] .purpose-heading h2,
+html[lang="kk"] .social-section-head h2,
+html[lang="kk"] .npa-intro h2{line-height:1.16;letter-spacing:-.025em}
+html[lang="kk"] .purpose-statement p{font-size:20px;line-height:1.62}
+html[lang="kk"] .eyebrow,
+html[lang="kk"] .purpose-statement>span,
+html[lang="kk"] .visual-copy span,
+html[lang="kk"] .social-copy small{letter-spacing:.08em}
+html[lang="kk"] .feature-card h3,
+html[lang="kk"] .news-card h3,
+html[lang="kk"] .resource-row h3,
+html[lang="kk"] .user-grid h3,
+html[lang="kk"] .principle-grid h3,
+html[lang="kk"] .application-grid h3{line-height:1.38}
+html[lang="kk"] .hero-copy>p,
+html[lang="kk"] .about-hero-copy p{line-height:1.72}
+html[lang="kk"] .purpose-heading h2{font-size:clamp(34px,3.5vw,46px)}
+@media (max-width:700px){html[lang="kk"] .hero h1{font-size:36px;line-height:1.12}html[lang="kk"] .about-hero-copy h1{font-size:38px;line-height:1.12}}
