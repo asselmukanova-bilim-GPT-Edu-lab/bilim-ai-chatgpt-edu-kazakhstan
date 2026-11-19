@@ -137,3 +137,41 @@ html[lang="kk"] .hero-copy>p,
 html[lang="kk"] .about-hero-copy p{line-height:1.72}
 html[lang="kk"] .purpose-heading h2{font-size:clamp(34px,3.5vw,46px)}
 @media (max-width:700px){html[lang="kk"] .hero h1{font-size:36px;line-height:1.12}html[lang="kk"] .about-hero-copy h1{font-size:38px;line-height:1.12}}
+
+/* Interactive regional statistics map */
+.kazakhstan-map-interactive{position:relative;width:132%;max-width:700px}
+.kazakhstan-map-interactive .kazakhstan-map{position:relative;z-index:0;width:100%;max-width:none}
+.kazakhstan-hotspots{position:absolute;z-index:2;inset:0;width:100%;height:100%;overflow:visible}
+.map-region{fill:rgba(255,255,255,0);stroke:rgba(255,255,255,0);stroke-width:8;vector-effect:non-scaling-stroke;cursor:pointer;outline:none;transition:fill .18s,stroke .18s,filter .18s}
+.map-region:hover,.map-region:focus-visible,.map-region.is-active{fill:rgba(255,255,255,.16);stroke:rgba(255,255,255,.96);filter:drop-shadow(0 0 10px rgba(104,68,238,.95))}
+.map-city{fill:rgba(255,255,255,.16);stroke:rgba(255,255,255,.62);stroke-width:4}
+.map-city:hover,.map-city:focus-visible,.map-city.is-active{fill:rgba(111,69,255,.7);stroke:#fff}
+.map-tooltip{position:absolute;z-index:5;width:min(310px,calc(100vw - 36px));padding:17px 18px 14px;border:1px solid rgba(255,255,255,.75);border-radius:18px;background:rgba(28,21,67,.94);color:#fff;box-shadow:0 18px 44px rgba(40,24,104,.3);backdrop-filter:blur(14px);pointer-events:auto;transform:translate(-50%,calc(-100% - 16px))}
+.map-tooltip.below{transform:translate(-50%,16px)}
+.map-tooltip-title{display:block;margin-bottom:12px;font-size:16px;line-height:1.28}
+.map-tooltip-content{display:grid;gap:10px}
+.map-tooltip-group{padding-top:9px;border-top:1px solid rgba(255,255,255,.16)}
+.map-tooltip-group:first-child{padding-top:0;border-top:0}
+.map-tooltip-group>strong{display:block;margin-bottom:5px;color:#d9d0ff;font-size:12px;text-transform:uppercase;letter-spacing:.07em}
+.map-tooltip-metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.map-tooltip-metric span,.map-tooltip-metric b{display:block}
+.map-tooltip-metric span{font-size:10px;color:#c8c1df}
+.map-tooltip-metric b{margin-top:1px;font-size:18px;line-height:1.2}
+.map-tooltip-source{display:block;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.16);color:#e6e0ff;font-size:10px;font-weight:700}
+.map-interaction-hint{position:absolute;z-index:3;right:12%;bottom:13%;display:inline-flex;padding:7px 11px;border:1px solid rgba(111,69,255,.16);border-radius:999px;background:rgba(255,255,255,.86);color:#625b79;font-size:11px;font-weight:700;box-shadow:0 7px 20px rgba(71,38,167,.1);pointer-events:none}
+html[lang="kk"] .map-tooltip-group>strong{letter-spacing:.04em}
+@media (min-width:981px){
+  .kazakhstan-map-interactive{width:118%;max-width:none}
+  .map-stage{z-index:auto;pointer-events:auto}
+}
+@media (max-width:980px){
+  .kazakhstan-map-interactive{width:min(100%,680px)}
+}
+@media (max-width:700px){
+  .kazakhstan-map-interactive{width:112%;max-width:none;margin-inline:-6%}
+  .map-tooltip{width:280px;padding:14px 15px 12px}
+  .map-tooltip-title{font-size:15px}
+  .map-tooltip-metric b{font-size:16px}
+  .map-interaction-hint{right:8%;bottom:8%;font-size:10px}
+}
+
