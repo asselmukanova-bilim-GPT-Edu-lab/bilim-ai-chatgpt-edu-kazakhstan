@@ -169,7 +169,8 @@ html[lang="kk"] .map-tooltip-group>strong{letter-spacing:.04em}
 }
 @media (max-width:700px){
   .kazakhstan-map-interactive{width:112%;max-width:none;margin-inline:-6%}
-  .map-tooltip{width:280px;padding:14px 15px 12px}
+  .kazakhstan-map-interactive .kazakhstan-map{margin-inline:0}
+  .map-tooltip{left:50%!important;width:min(310px,calc(100% - 44px));padding:14px 15px 12px}
   .map-tooltip-title{font-size:15px}
   .map-tooltip-metric b{font-size:16px}
   .map-interaction-hint{right:8%;bottom:8%;font-size:10px}
