@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BilimAI Mektep плагиндері</title>
+  <link rel="stylesheet" href="webinar.css">
+  <style>
+    .appbar .muted{color:#5c687a}.controls #timing{display:none}.appbar>a{font-size:13px;font-weight:700;text-decoration:none}
+  </style>
+</head>
+<body>
+  <header class="appbar">
+    <span>BilimAI <span class="muted">/ Ustaz · Tarbie · Gylym</span></span>
+    <nav>
+      <a href="../plugins.html">Сайтқа оралу</a>
+      <button id="menu">Мазмұны</button>
+      <button id="notes">Жүргізуші жазбалары</button>
+      <button id="fullscreen" aria-label="Толық экран">⛶</button>
+    </nav>
+  </header>
+  <main id="viewport"><article id="slide" aria-live="polite"></article></main>
+  <footer class="controls">
+    <button id="prev" aria-label="Алдыңғы слайд">←</button>
+    <span id="counter"></span><span id="timing"></span>
+    <div class="progress" aria-label="Барысы"><div id="progress"></div></div>
+    <button id="next" aria-label="Келесі слайд">→</button>
+  </footer>
+  <dialog id="menuDialog"><button class="close" data-close>Жабу ✕</button><h2>BilimAI Mektep · 3 слайд</h2><div id="menuItems"></div></dialog>
+  <dialog id="notesDialog"><button class="close" data-close>Жабу ✕</button><div id="noteContent"></div></dialog>
+  <dialog id="topicDialog"><button class="close" data-close>Жабу ✕</button><div id="topicContent"></div></dialog>
+  <dialog id="viewer"><div class="viewerbar"><button id="return">Презентацияға оралу</button><strong id="viewerTitle"></strong><div id="viewerLang"></div><a id="standalone" target="_blank" rel="noopener">Бөлек ашу</a></div><div id="frames"></div></dialog>
+  <dialog id="practiceDialog"><button class="close" data-close>Презентацияға оралу ✕</button><h2>Сұрау дайындаңыз</h2><form id="practiceForm"><div id="practiceFields"></div><label>Дайын сұрау<textarea id="practiceOutput" rows="7" readonly></textarea></label><div class="actions"><button type="submit" class="primary">Сұрауды құрастыру</button><button type="button" id="copyPractice">Көшіру</button><button type="reset">Тазарту</button></div><p id="practiceStatus" role="status"></p></form></dialog>
+  <div id="toast" role="status"></div>
+  <script src="slides-kk.js"></script>
+  <script src="webinar-kk.js"></script>
+</body>
+</html>
