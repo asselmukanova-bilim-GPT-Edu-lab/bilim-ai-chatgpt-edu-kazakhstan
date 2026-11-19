@@ -304,9 +304,10 @@ function positionMapTooltip(point) {
   const bounds = mapInteractive.getBoundingClientRect();
   const tooltipHalfWidth = Math.min(155, Math.max(120, bounds.width / 3));
   const isWideMap = bounds.width >= 620;
+  const mobileEdge = 22;
   const x = isWideMap
     ? bounds.width - tooltipHalfWidth - 12
-    : Math.max(tooltipHalfWidth, Math.min(bounds.width - tooltipHalfWidth, point.clientX - bounds.left));
+    : Math.max(tooltipHalfWidth + mobileEdge, Math.min(bounds.width - tooltipHalfWidth - mobileEdge, point.clientX - bounds.left));
   const y = isWideMap
     ? Math.min(300, bounds.height * .46)
     : Math.max(12, Math.min(bounds.height - 12, point.clientY - bounds.top));
