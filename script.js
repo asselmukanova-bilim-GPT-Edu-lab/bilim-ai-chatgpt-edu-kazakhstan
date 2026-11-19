@@ -227,3 +227,188 @@ applyLanguage(savedLanguage);
 languageButton?.addEventListener('click', () => {
   applyLanguage(document.documentElement.lang === 'kk' ? 'ru' : 'kk');
 });
+
+const regionalLicenseData = {
+  'Акмолинская область': { kindergarten: { activated: 163, using: 122 }, school: { activated: 4381, using: 3900 } },
+  'Актюбинская область': { kindergarten: { activated: 192, using: 143 }, school: { activated: 4176, using: 3429 } },
+  'Алматинская область': { kindergarten: { activated: 170, using: 126 }, school: { activated: 5594, using: 5526 } },
+  'Атырауская область': { kindergarten: { activated: 74, using: 56 }, school: { activated: 2350, using: 1975 } },
+  'Восточно-Казахстанская область': { kindergarten: { activated: 128, using: 100 }, school: { activated: 1283, using: 1098 } },
+  'г. Алматы': { kindergarten: { activated: 113, using: 88 }, school: { activated: 3568, using: 3156 } },
+  'г. Астана': { kindergarten: { activated: 365, using: 284 }, school: { activated: 4062, using: 3514 } },
+  'г. Шымкент': { kindergarten: { activated: 64, using: 37 }, school: { activated: 2478, using: 2470 } },
+  'Жамбылская область': { kindergarten: { activated: 458, using: 316 }, school: { activated: 4875, using: 4869 } },
+  'Западно-Казахстанская область': { kindergarten: { activated: 232, using: 200 }, school: { activated: 4577, using: 4571 } },
+  'Карагандинская область': { kindergarten: { activated: 299, using: 271 }, school: { activated: 3464, using: 3032 } },
+  'Костанайская область': { kindergarten: { activated: 260, using: 229 }, school: { activated: 4822, using: 4024 } },
+  'Кызылординская область': { kindergarten: { activated: 256, using: 173 }, school: { activated: 4227, using: 4215 } },
+  'Мангистауская область': { kindergarten: { activated: 49, using: 33 }, school: { activated: 2329, using: 2009 } },
+  'Область Абай': { kindergarten: { activated: 115, using: 88 }, school: { activated: 2189, using: 1801 } },
+  'Область Жетісу': { kindergarten: { activated: 159, using: 138 }, school: { activated: 3658, using: 3162 } },
+  'Область Ұлытау': { kindergarten: { activated: 21, using: 20 }, school: { activated: 974, using: 763 } },
+  'Павлодарская область': { kindergarten: { activated: 280, using: 208 }, school: { activated: 1885, using: 1559 } },
+  'Северо-Казахстанская область': { kindergarten: { activated: 135, using: 96 }, school: { activated: 2263, using: 1910 } },
+  'Туркестанская область': { kindergarten: { activated: 519, using: 325 }, school: { activated: 11444, using: 11273 } }
+};
+
+const regionNamesKk = {
+  'Акмолинская область': 'Ақмола облысы',
+  'Актюбинская область': 'Ақтөбе облысы',
+  'Алматинская область': 'Алматы облысы',
+  'Атырауская область': 'Атырау облысы',
+  'Восточно-Казахстанская область': 'Шығыс Қазақстан облысы',
+  'г. Алматы': 'Алматы қ.',
+  'г. Астана': 'Астана қ.',
+  'г. Шымкент': 'Шымкент қ.',
+  'Жамбылская область': 'Жамбыл облысы',
+  'Западно-Казахстанская область': 'Батыс Қазақстан облысы',
+  'Карагандинская область': 'Қарағанды облысы',
+  'Костанайская область': 'Қостанай облысы',
+  'Кызылординская область': 'Қызылорда облысы',
+  'Мангистауская область': 'Маңғыстау облысы',
+  'Область Абай': 'Абай облысы',
+  'Область Жетісу': 'Жетісу облысы',
+  'Область Ұлытау': 'Ұлытау облысы',
+  'Павлодарская область': 'Павлодар облысы',
+  'Северо-Казахстанская область': 'Солтүстік Қазақстан облысы',
+  'Туркестанская область': 'Түркістан облысы'
+};
+
+const mapInteractive = document.querySelector('.kazakhstan-map-interactive');
+const mapTooltip = document.querySelector('.map-tooltip');
+const mapTooltipTitle = document.querySelector('.map-tooltip-title');
+const mapTooltipContent = document.querySelector('.map-tooltip-content');
+const mapTooltipSource = document.querySelector('.map-tooltip-source');
+const mapHint = document.querySelector('.map-interaction-hint');
+const mapRegions = Array.from(document.querySelectorAll('.map-region'));
+let activeRegion = null;
+let activePoint = null;
+let mapTooltipPinned = false;
+
+function formatLicenseNumber(value) {
+  return new Intl.NumberFormat(document.documentElement.lang === 'kk' ? 'kk-KZ' : 'ru-RU').format(value);
+}
+
+function getMapLabels() {
+  return document.documentElement.lang === 'kk'
+    ? { school: 'Мектептер', kindergarten: 'Балабақшалар', activated: 'Белсендірді', using: 'Пайдаланып жүр', hint: 'Өңірді таңдаңыз', source: 'Power BI · 19.11.2026 жаңартылды' }
+    : { school: 'Школы', kindergarten: 'Детские сады', activated: 'Активировали', using: 'Используют', hint: 'Наведите на область', source: 'Power BI · обновлено 19.11.2026' };
+}
+
+function getRegionDisplayName(region) {
+  return document.documentElement.lang === 'kk' ? (regionNamesKk[region] || region) : region;
+}
+
+function positionMapTooltip(point) {
+  if (!mapInteractive || !mapTooltip || !point) return;
+  const bounds = mapInteractive.getBoundingClientRect();
+  const tooltipHalfWidth = Math.min(155, Math.max(120, bounds.width / 3));
+  const isWideMap = bounds.width >= 620;
+  const x = isWideMap
+    ? bounds.width - tooltipHalfWidth - 12
+    : Math.max(tooltipHalfWidth, Math.min(bounds.width - tooltipHalfWidth, point.clientX - bounds.left));
+  const y = isWideMap
+    ? Math.min(300, bounds.height * .46)
+    : Math.max(12, Math.min(bounds.height - 12, point.clientY - bounds.top));
+  mapTooltip.style.left = `${x}px`;
+  mapTooltip.style.top = `${y}px`;
+  mapTooltip.classList.toggle('below', y < 215);
+}
+
+function renderMapTooltip() {
+  if (!activeRegion || !mapTooltip || !mapTooltipTitle || !mapTooltipContent) return;
+  const data = regionalLicenseData[activeRegion];
+  if (!data) return;
+  const labels = getMapLabels();
+  mapTooltipTitle.textContent = getRegionDisplayName(activeRegion);
+  mapTooltipContent.innerHTML = [
+    ['school', labels.school],
+    ['kindergarten', labels.kindergarten]
+  ].map(([key, title]) => `
+    <div class="map-tooltip-group">
+      <strong>${title}</strong>
+      <div class="map-tooltip-metrics">
+        <div class="map-tooltip-metric"><span>${labels.activated}</span><b>${formatLicenseNumber(data[key].activated)}</b></div>
+        <div class="map-tooltip-metric"><span>${labels.using}</span><b>${formatLicenseNumber(data[key].using)}</b></div>
+      </div>
+    </div>`).join('');
+  if (mapTooltipSource) mapTooltipSource.textContent = labels.source;
+  positionMapTooltip(activePoint);
+}
+
+function showRegionTooltip(region, event, pinned = false) {
+  if (!mapTooltip || !regionalLicenseData[region]) return;
+  mapRegions.forEach((area) => area.classList.toggle('is-active', area.dataset.region === region));
+  activeRegion = region;
+  mapTooltipPinned = pinned || mapTooltipPinned;
+  if (event?.clientX) {
+    activePoint = { clientX: event.clientX, clientY: event.clientY };
+  } else {
+    const area = mapRegions.find((item) => item.dataset.region === region);
+    const areaBounds = area?.getBoundingClientRect();
+    if (areaBounds) activePoint = { clientX: areaBounds.left + areaBounds.width / 2, clientY: areaBounds.top + areaBounds.height / 2 };
+  }
+  mapTooltip.hidden = false;
+  renderMapTooltip();
+}
+
+function hideRegionTooltip(force = false) {
+  if (!mapTooltip || (mapTooltipPinned && !force)) return;
+  mapTooltip.hidden = true;
+  mapRegions.forEach((area) => area.classList.remove('is-active'));
+  activeRegion = null;
+  activePoint = null;
+  if (force) mapTooltipPinned = false;
+}
+
+mapRegions.forEach((area) => {
+  const region = area.dataset.region;
+  area.setAttribute('tabindex', '0');
+  area.setAttribute('role', 'button');
+  area.addEventListener('pointerenter', (event) => {
+    if (!mapTooltipPinned) showRegionTooltip(region, event);
+  });
+  area.addEventListener('pointermove', (event) => {
+    if (!mapTooltipPinned && activeRegion === region) {
+      activePoint = { clientX: event.clientX, clientY: event.clientY };
+      positionMapTooltip(activePoint);
+    }
+  });
+  area.addEventListener('focus', () => showRegionTooltip(region));
+  area.addEventListener('blur', () => hideRegionTooltip());
+  area.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const wasPinned = mapTooltipPinned && activeRegion === region;
+    mapTooltipPinned = !wasPinned;
+    if (wasPinned) hideRegionTooltip(true);
+    else showRegionTooltip(region, event, true);
+  });
+  area.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      area.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: activePoint?.clientX || 0, clientY: activePoint?.clientY || 0 }));
+    }
+    if (event.key === 'Escape') hideRegionTooltip(true);
+  });
+});
+
+mapInteractive?.addEventListener('pointerleave', () => hideRegionTooltip());
+document.addEventListener('click', (event) => {
+  if (mapTooltipPinned && !event.target.closest('.kazakhstan-map-interactive')) hideRegionTooltip(true);
+});
+
+function updateMapLanguage() {
+  const labels = getMapLabels();
+  if (mapHint) mapHint.textContent = labels.hint;
+  mapRegions.forEach((area) => {
+    const region = area.dataset.region;
+    const data = regionalLicenseData[region];
+    if (!data) return;
+    area.setAttribute('aria-label', `${getRegionDisplayName(region)}. ${labels.school}: ${labels.activated.toLowerCase()} ${formatLicenseNumber(data.school.activated)}, ${labels.using.toLowerCase()} ${formatLicenseNumber(data.school.using)}. ${labels.kindergarten}: ${labels.activated.toLowerCase()} ${formatLicenseNumber(data.kindergarten.activated)}, ${labels.using.toLowerCase()} ${formatLicenseNumber(data.kindergarten.using)}.`);
+  });
+  if (activeRegion) renderMapTooltip();
+}
+
+updateMapLanguage();
+languageButton?.addEventListener('click', updateMapLanguage);
+
