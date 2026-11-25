@@ -4,12 +4,127 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>О проекте — Bilim AI</title>
-  <meta name="description" content="Цель, миссия, пользователи и партнёры проекта ChatGPT EDU Kazakhstan для системы образования.">
+  <meta name="description" content="ChatGPT Edu — национальный проект по внедрению ИИ в систему образования. Распределение и начало выдачи лицензий.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Noto+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="assets/bilim-ai-logo-symbol.png">
   <link rel="stylesheet" href="styles.css?v=20260928-4">
+  <style>
+    html[lang="ru"] .project-overview [lang="kk"],
+    html[lang="kk"] .project-overview [lang="ru"] { display: none; }
+
+    .project-overview {
+      min-height: calc(100svh - 82px);
+      background: radial-gradient(ellipse at 93% 0%, #ece6ff, transparent 43%), #fff;
+    }
+    .project-overview-inner { padding-block: clamp(40px, 6vw, 80px); }
+    .project-organizations {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: .6rem 1.4rem;
+      margin: 0 0 1.5rem;
+      padding: 0;
+      list-style: none;
+      font-size: .95rem;
+      font-weight: 800;
+    }
+    .project-organizations li + li {
+      border-inline-start: 1px solid var(--line);
+      padding-inline-start: 1.4rem;
+    }
+    .project-overview h1 {
+      margin: 0;
+      color: #4d27cc;
+      font-size: clamp(3.25rem, 7vw, 6rem);
+      line-height: 1.04;
+      letter-spacing: -.055em;
+    }
+    .project-subtitle {
+      max-width: 36ch;
+      margin: 1.1rem 0 0;
+      color: #4d27cc;
+      font-size: clamp(1.35rem, 3vw, 2.15rem);
+      font-weight: 800;
+      line-height: 1.22;
+    }
+    .project-intro {
+      max-width: 72ch;
+      margin: 1rem 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.25rem);
+    }
+    .project-figures {
+      display: grid;
+      grid-template-columns: minmax(0, 4fr) minmax(0, 5fr);
+      align-items: center;
+      gap: clamp(1.6rem, 5vw, 4rem);
+      margin-top: clamp(2rem, 5vw, 4rem);
+    }
+    .project-allocation,
+    .project-highlights { margin: 0; }
+    .project-allocation > div {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: .8rem;
+      padding: .65rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .project-allocation > div:last-child { border-bottom: 0; }
+    .project-allocation dt { font-weight: 700; line-height: 1.35; }
+    .project-allocation dd {
+      min-width: 6.2em;
+      margin: 0;
+      padding: .38rem .7rem;
+      border-radius: 999px;
+      background: linear-gradient(125deg, #4d27cc, #6239e5);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 800;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    .project-summary h2 {
+      margin: 0 0 1rem;
+      color: #4d27cc;
+      font-size: clamp(1.25rem, 2.35vw, 1.75rem);
+      line-height: 1.25;
+    }
+    .project-highlights {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .project-highlights > div {
+      display: flex;
+      flex-direction: column-reverse;
+      justify-content: flex-end;
+      gap: .45rem;
+      padding: clamp(.85rem, 2vw, 1.6rem);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: linear-gradient(145deg, #f0ebff, #fbfaff);
+    }
+    .project-highlights dt { font-weight: 700; line-height: 1.32; }
+    .project-highlights dd {
+      margin: 0;
+      color: #4d27cc;
+      font-size: clamp(1.3rem, 3.1vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -.035em;
+    }
+    @media (max-width: 860px) {
+      .project-figures { grid-template-columns: minmax(0, 1fr); }
+      .project-organizations { justify-content: flex-start; }
+    }
+    @media (max-width: 460px) {
+      .project-organizations { column-gap: .65rem; }
+      .project-organizations li + li { padding-inline-start: .65rem; }
+    }
+  </style>
 </head>
 <body class="about-page">
   <header class="site-header">
@@ -28,97 +143,39 @@
     </div>
   </header>
 
-  <main>
-    <section class="about-hero">
-      <div class="container about-hero-grid">
-        <div class="about-hero-copy">
-          <span class="eyebrow light">О проекте</span>
-          <h1>ChatGPT EDU для системы образования Казахстана</h1>
-          <p>Корпоративное рабочее пространство с современными ИИ-инструментами для педагогов, исследователей, студентов и образовательных организаций.</p>
-        </div>
-        <div class="about-hero-visual" aria-label="Ключевые показатели проекта">
-          <img src="assets/bilim-ai-logo-symbol.png" alt="" aria-hidden="true">
-          <div class="about-metric about-metric-large"><strong>165 000</strong><span>лицензий в масштабе проекта</span></div>
-          <div class="about-metric"><strong>30 марта 2026</strong><span>запуск программы</span></div>
-          <div class="about-metric"><strong>0 ₸</strong><span>стоимость доступа для пользователя</span></div>
-        </div>
+  <main class="project-overview">
+    <div class="container project-overview-inner">
+      <ul class="project-organizations">
+        <li translate="no">Bilim UpSkill</li>
+        <li translate="no">OpenAI</li>
+        <li translate="no">Freedom Holding Corp.</li>
+      </ul>
+      <h1 translate="no">ChatGPT Edu</h1>
+      <p class="project-subtitle"><span lang="ru">Национальный проект по внедрению ИИ в систему образования</span><span lang="kk">Білім беру жүйесіне жасанды интеллектіні енгізу жөніндегі ұлттық жоба</span></p>
+      <p class="project-intro"><span lang="ru">Бесплатный и безопасный доступ к ИИ для педагогов и сотрудников организаций образования, научных сотрудников и участников AstanaHub</span><span lang="kk">Педагогтерге, білім беру ұйымдарының қызметкерлеріне, ғылыми қызметкерлерге және AstanaHub қатысушыларына жасанды интеллектіні тегін әрі қауіпсіз пайдалану мүмкіндігі</span></p>
+      <div class="project-figures">
+        <dl class="project-allocation">
+          <div><dt><span lang="ru">Вузы и НИИ</span><span lang="kk">Жоғары оқу орындары мен ғылыми-зерттеу институттары</span></dt><dd>62&nbsp;800</dd></div>
+          <div><dt><span lang="ru">Колледжи</span><span lang="kk">Колледждер</span></dt><dd>10&nbsp;000</dd></div>
+          <div><dt><span lang="ru">Школы</span><span lang="kk">Мектептер</span></dt><dd>85&nbsp;000</dd></div>
+          <div><dt><span lang="ru">Детские сады</span><span lang="kk">Балабақшалар</span></dt><dd>5&nbsp;000</dd></div>
+          <div><dt>AstanaHub</dt><dd>2&nbsp;200</dd></div>
+        </dl>
+        <section class="project-summary">
+          <h2><span lang="ru">Цифровая трансформация образования и науки</span><span lang="kk">Білім беру мен ғылымды цифрлық трансформациялау</span></h2>
+          <dl class="project-highlights">
+            <div>
+              <dt><span lang="ru">Начало выдачи лицензий</span><span lang="kk">Лицензия берудің басталуы</span></dt>
+              <dd><span lang="ru">30 марта</span><span lang="kk">30 наурыз</span></dd>
+            </div>
+            <div>
+              <dt><span lang="ru">Лицензий</span><span lang="kk">Лицензия</span></dt>
+              <dd>165&nbsp;000</dd>
+            </div>
+          </dl>
+        </section>
       </div>
-    </section>
-
-    <section class="about-purpose">
-      <div class="container purpose-grid">
-        <div class="purpose-heading">
-          <h2>Цель и миссия</h2>
-        </div>
-        <article class="purpose-statement mission-statement">
-          <span>Миссия</span>
-          <p>Помочь системе образования Казахстана применять искусственный интеллект ответственно, сохраняя академическую честность, конфиденциальность и самостоятельность мышления.</p>
-        </article>
-        <article class="purpose-statement goal-statement">
-          <span>Цель</span>
-          <p>Внедрить ChatGPT EDU в образовательный процесс, обучить практическому применению ИИ и повысить качество подготовки специалистов для цифровой экономики Казахстана.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="section about-users">
-      <div class="container">
-        <div class="section-head about-section-head">
-          <div><h2>Пользователи</h2></div>
-        </div>
-        <div class="user-grid">
-          <article><h3>Педагоги и преподаватели</h3><p>Готовят учебные материалы, задания и персональные GPT-ассистенты, работают с документами и данными.</p></article>
-          <article><h3>Исследователи и учёные</h3><p>Проводят обзор литературы, анализируют данные, редактируют публикации и готовят грантовые заявки.</p></article>
-          <article><h3>Студенты</h3><p>Осваивают технологии, разрабатывают проекты и решают профессиональные задачи с соблюдением академической честности.</p></article>
-          <article><h3>Администраторы организаций</h3><p>Ведут списки пользователей, выдают учётные данные и управляют доступом на уровне организации.</p></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section stakeholders-section">
-      <div class="container">
-        <div class="section-head about-section-head">
-          <div><h2>Стейкхолдеры проекта</h2></div>
-        </div>
-        <div class="stakeholder-list">
-          <article><h3>Freedom Holding</h3><p>Оплата лицензий и сопровождения проекта.</p></article>
-          <article><h3>Freedom Bank</h3><p>Участие в предусмотренной проектом верификации.</p></article>
-          <article><h3>OpenAI</h3><p>Предоставление лицензий и поддержка оператора.</p></article>
-          <article><h3>Bilim Upskill</h3><p>Подключение лицензий, ИИ-методология и поддержка пользователей.</p></article>
-          <article><h3>МИИЦР, МП и МНВО</h3><p>Координация направления, администраторов и политики применения ИИ.</p></article>
-          <article><h3>Администраторы</h3><p>Управление учётными записями и передача доступа пользователям.</p></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="about-principles">
-      <div class="container">
-        <div class="section-head"><div><h2>Принципы доступа</h2></div></div>
-        <div class="principle-grid">
-          <article><h3>Доступ без оплаты</h3><p>Пользователь получает корпоративный уровень ChatGPT EDU за 0 ₸.</p></article>
-          <article><h3>Конфиденциальность</h3><p>Запросы остаются внутри рабочего пространства организации.</p></article>
-          <article><h3>Защита данных</h3><p>Запросы и данные не используются для обучения моделей OpenAI.</p></article>
-          <article><h3>Управление организацией</h3><p>Учётные записи и доступы администрируются централизованно.</p></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section application-section">
-      <div class="container">
-        <div class="section-head about-section-head">
-          <div><span class="eyebrow">Практическая работа</span><h2>Как применяют ChatGPT EDU</h2></div>
-          <p>Инструменты помогают в повседневной работе, обучении и исследовательских проектах.</p>
-        </div>
-        <div class="application-grid">
-          <article><span>▤</span><h3>Учебные материалы</h3><p>Лекции, тесты, задания, силлабусы и GPT-ассистенты.</p></article>
-          <article><span>◇</span><h3>Гранты и отчёты</h3><p>Заявки на финансирование и научные отчёты.</p></article>
-          <article><span>✎</span><h3>Научные статьи</h3><p>Подготовка, редактирование, перевод и обзор литературы.</p></article>
-          <article><span>▥</span><h3>Анализ данных</h3><p>Код, визуализация, статистический анализ и интерпретация результатов.</p></article>
-          <article><span>文</span><h3>Языковая поддержка</h3><p>Перевод и редактирование материалов для международной коммуникации.</p></article>
-          <article><span>✓</span><h3>Документация</h3><p>Протоколы, официальные письма, приказы и рабочие документы.</p></article>
-        </div>
-      </div>
-    </section>
+    </div>
   </main>
 
   <script src="script.js?v=20260928-3"></script>
