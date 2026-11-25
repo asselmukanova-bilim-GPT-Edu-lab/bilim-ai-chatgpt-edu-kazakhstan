@@ -4,12 +4,35 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Плагины — Bilim AI</title>
-  <meta name="description" content="Страницы презентации о плагинах Ustaz, Tarbie и Gylym BilimAI Mektep.">
+  <meta name="description" content="Назначение и принцип работы плагинов Ustaz, Tarbie и Gylym BilimAI Mektep.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Noto+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="assets/bilim-ai-logo-symbol.png">
   <link rel="stylesheet" href="styles.css?v=20261120-1">
+  <style>
+    html[lang="ru"] .plugin-guide [lang="kk"],
+    html[lang="kk"] .plugin-guide [lang="ru"] { display: none; }
+
+    .plugin-slide-copy.plugin-guide { padding-top: 18px; }
+    .plugin-guide-steps {
+      display: grid;
+      gap: 1rem;
+      margin: 0;
+    }
+    .plugin-guide-steps dt { margin-bottom: .25rem; font-weight: 800; }
+    .plugin-guide-steps dd {
+      margin: 0;
+      color: #4f5876;
+      font-size: 1rem;
+      line-height: 1.55;
+    }
+    .plugin-guide .plugin-info-block {
+      min-height: 0;
+      margin-top: 1rem;
+      padding-top: .8rem;
+    }
+  </style>
 </head>
 <body class="plugins-page plugin-cards-page">
   <header class="site-header">
@@ -43,11 +66,22 @@
             <img src="assets/bilim-ai-logo-symbol.png" alt="" aria-hidden="true">
             <strong>Ustaz BilimAI Mektep</strong>
           </a>
-          <div class="plugin-slide-copy">
-            <p class="plugin-summary">Подготовка к уроку: планирование, материалы, оценивание и интерактивы.</p>
+          <div class="plugin-slide-copy plugin-guide">
+            <dl class="plugin-guide-steps">
+              <div>
+                <dt><span lang="ru">Для чего</span><span lang="kk">Не үшін қажет</span></dt>
+                <dd><span lang="ru">Помогает учителю подготовить урок: составить КТП или КСП, разработать задания, критерии оценивания и рабочие листы.</span><span lang="kk">Мұғалімге сабаққа дайындалуға көмектеседі: КТЖ немесе ҚМЖ құрады, тапсырмалар, бағалау критерийлері мен жұмыс парақтарын әзірлейді.</span></dd>
+              </div>
+              <div>
+                <dt><span lang="ru">Как работает</span><span lang="kk">Қалай жұмыс істейді</span></dt>
+                <dd><span lang="ru">Укажите предмет, класс, тему и цель обучения. Плагин подготовит черновик, который можно проверить и адаптировать для своего класса.</span><span lang="kk">Пәнді, сыныпты, тақырыпты және оқу мақсатын көрсетіңіз. Плагин тексеріп, сыныбыңызға бейімдеуге болатын бастапқы нұсқаны дайындайды.</span></dd>
+              </div>
+              <div>
+                <dt>BilimClass</dt>
+                <dd><span lang="ru">Плагин можно подключить к BilimClass и использовать данные о классе и уроке при подготовке материалов.</span><span lang="kk">Плагинді BilimClass платформасына қосып, материал дайындау кезінде сынып пен сабақ туралы деректерді пайдалануға болады.</span></dd>
+              </div>
+            </dl>
             <div class="plugin-info-block"><h3>Нормативная основа</h3><p>Закон РК «Об образовании»; ГОСО — приказ № 348; типовые учебные программы — № 399; обязательные документы педагога — № 130; правила оценивания — № 125.</p></div>
-            <div class="plugin-info-block"><h3>Чем полезен</h3><p>Помогает готовить КТП и ҚМЖ/КСП, рабочие и лабораторные листы, презентации, задания с критериями, тренажёры и виртуальные лаборатории.</p></div>
-            <div class="plugin-links"><a href="plugins-deck/index-kk.html#slide-1" target="_blank" rel="noopener">Открыть презентацию</a><a href="materials.html">Смотреть документы</a></div>
           </div>
         </article>
 
@@ -56,11 +90,18 @@
             <img src="assets/bilim-ai-logo-symbol.png" alt="" aria-hidden="true">
             <strong>Tarbie BilimAI Mektep</strong>
           </a>
-          <div class="plugin-slide-copy">
-            <p class="plugin-summary">Воспитательная работа: планы, классные часы, родители и профилактика буллинга.</p>
+          <div class="plugin-slide-copy plugin-guide">
+            <dl class="plugin-guide-steps">
+              <div>
+                <dt><span lang="ru">Для чего</span><span lang="kk">Не үшін қажет</span></dt>
+                <dd><span lang="ru">Помогает классному руководителю составлять планы воспитательной работы, готовить классные часы и материалы для родителей, планировать профилактику буллинга.</span><span lang="kk">Сынып жетекшісіне тәрбие жұмысын жоспарлауға, сынып сағаттары мен ата-аналарға арналған материалдарды дайындауға, буллингтің алдын алу шараларын жоспарлауға көмектеседі.</span></dd>
+              </div>
+              <div>
+                <dt><span lang="ru">Как работает</span><span lang="kk">Қалай жұмыс істейді</span></dt>
+                <dd><span lang="ru">Выберите задачу и укажите класс, тему и формат. Плагин предложит план, сценарий или текст, который можно адаптировать под свой класс.</span><span lang="kk">Тапсырманы таңдап, сыныпты, тақырыпты және форматты көрсетіңіз. Плагин сыныбыңызға бейімдеуге болатын жоспар, сценарий немесе мәтін ұсынады.</span></dd>
+              </div>
+            </dl>
             <div class="plugin-info-block"><h3>Нормативная основа</h3><p>Закон РК «Об образовании»; единая программа воспитания «Адал азамат» — приказ № 123; положение о классном руководстве — № 18; правила профилактики буллинга — № 506.</p></div>
-            <div class="plugin-info-block"><h3>Чем полезен</h3><p>Создаёт годовые планы воспитательной работы, материалы классных часов и родительских собраний, сообщения для родителей и планы профилактики буллинга.</p></div>
-            <div class="plugin-links"><a href="plugins-deck/index-kk.html#slide-2" target="_blank" rel="noopener">Открыть презентацию</a><a href="materials.html">Смотреть документы</a></div>
           </div>
         </article>
 
@@ -69,11 +110,18 @@
             <img src="assets/bilim-ai-logo-symbol.png" alt="" aria-hidden="true">
             <strong>Gylym BilimAI Mektep</strong>
           </a>
-          <div class="plugin-slide-copy">
-            <p class="plugin-summary">Олимпиады, PBL, PISA, Дарын, Зерде и STEM/STEAM-проекты.</p>
+          <div class="plugin-slide-copy plugin-guide">
+            <dl class="plugin-guide-steps">
+              <div>
+                <dt><span lang="ru">Для чего</span><span lang="kk">Не үшін қажет</span></dt>
+                <dd><span lang="ru">Помогает готовиться к олимпиадам, заданиям формата PISA и конкурсам «Дарын» и «Зерде», а также разрабатывать учебные и исследовательские проекты.</span><span lang="kk">Олимпиадаларға, PISA форматындағы тапсырмаларға, «Дарын» және «Зерде» байқауларына дайындалуға, сондай-ақ оқу және зерттеу жобаларын әзірлеуге көмектеседі.</span></dd>
+              </div>
+              <div>
+                <dt><span lang="ru">Как работает</span><span lang="kk">Қалай жұмыс істейді</span></dt>
+                <dd><span lang="ru">Выберите направление и укажите класс, тему или требования конкурса. Плагин предложит шаги подготовки, тренировочные задания или структуру проекта и его защиты.</span><span lang="kk">Бағытты таңдап, сыныпты, тақырыпты немесе байқау талаптарын көрсетіңіз. Плагин дайындық қадамдарын, жаттығу тапсырмаларын немесе жобаның құрылымы мен қорғау жоспарын ұсынады.</span></dd>
+              </div>
+            </dl>
             <div class="plugin-info-block"><h3>Нормативная основа</h3><p>ГОСО — приказ № 348; перечни олимпиад и конкурсов — приказы № 514 и № 333; правила формирования сборных — № 45; положения и критерии конкретных конкурсов РНПЦ «Дарын».</p></div>
-            <div class="plugin-info-block"><h3>Чем полезен</h3><p>Помогает выбрать конкурсный маршрут, составить план подготовки, разобрать олимпиадные задачи, спроектировать исследование, PBL или STEM/STEAM-проект и подготовиться к защите.</p></div>
-            <div class="plugin-links"><a href="plugins-deck/index-kk.html#slide-3" target="_blank" rel="noopener">Открыть презентацию</a><a href="materials.html">Смотреть документы</a></div>
           </div>
         </article>
       </div>
