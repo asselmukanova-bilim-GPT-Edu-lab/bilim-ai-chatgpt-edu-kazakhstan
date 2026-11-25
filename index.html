@@ -10,6 +10,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Noto+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="assets/bilim-ai-logo-symbol.png">
   <link rel="stylesheet" href="styles.css?v=20261119-10">
+  <style>
+    .licenses-hero { background: #f9faff; }
+    .licenses-frame {
+      display: block;
+      width: 100%;
+      height: calc(60.2vw + 3rem);
+      border: 0;
+    }
+    @media (max-width: 650px) {
+      .licenses-frame { height: calc(60.2vw + 8rem); }
+    }
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -29,45 +41,8 @@
   </header>
 
   <main id="top">
-    <section class="hero" id="about">
-      <div class="container hero-grid">
-        <div class="hero-copy">
-          <h1>Единое пространство<br>Bilim AI и ChatGPT EDU</h1>
-          <p>Инструменты, методические материалы, обучение и профессиональное сообщество для ответственного применения искусственного интеллекта в образовании Казахстана.</p>
-        </div>
-        <div class="map-stage">
-          <div class="kazakhstan-map-interactive">
-            <img class="kazakhstan-map" src="assets/kazakhstan-map-option-1.png" alt="Карта Казахстана с областями в фирменных цветах Bilim AI">
-            <svg class="kazakhstan-hotspots" viewBox="0 0 1671 941" aria-label="Интерактивная карта использования лицензий по регионам Казахстана">
-              <path class="map-region" data-region="Западно-Казахстанская область" d="M315 352 L359 313 L441 297 L514 324 L552 378 L533 438 L475 472 L382 456 L329 419 Z"/>
-              <path class="map-region" data-region="Атырауская область" d="M322 430 L405 455 L478 469 L502 522 L469 566 L383 576 L342 543 L363 501 L321 479 Z"/>
-              <path class="map-region" data-region="Мангистауская область" d="M387 548 L470 528 L555 568 L545 640 L532 735 L499 744 L476 696 L422 704 L389 657 L405 608 Z"/>
-              <path class="map-region" data-region="Актюбинская область" d="M492 329 L590 306 L681 342 L742 391 L786 493 L710 547 L637 591 L553 567 L501 518 L523 455 L548 391 Z"/>
-              <path class="map-region" data-region="Костанайская область" d="M684 247 L747 217 L838 209 L842 307 L817 367 L773 414 L731 385 L679 344 Z"/>
-              <path class="map-region" data-region="Северо-Казахстанская область" d="M839 205 L909 176 L975 188 L1004 234 L976 289 L934 315 L844 304 Z"/>
-              <path class="map-region" data-region="Акмолинская область" d="M838 303 L899 271 L975 277 L1040 320 L1048 374 L1005 413 L944 410 L902 386 L850 409 L813 369 Z"/>
-              <path class="map-region" data-region="Павлодарская область" d="M1002 238 L1078 204 L1130 230 L1168 297 L1162 356 L1119 396 L1052 375 L1039 319 L977 288 Z"/>
-              <path class="map-region" data-region="Карагандинская область" d="M904 393 L951 411 L1003 402 L1050 373 L1120 397 L1150 456 L1118 536 L1038 567 L947 566 L875 548 L842 490 Z"/>
-              <path class="map-region" data-region="Область Ұлытау" d="M763 437 L819 399 L873 416 L905 393 L930 445 L881 509 L866 574 L805 574 L746 538 L733 489 Z"/>
-              <path class="map-region" data-region="Кызылординская область" d="M594 558 L694 526 L744 538 L806 574 L872 578 L882 652 L817 676 L744 653 L689 663 L626 621 Z"/>
-              <path class="map-region" data-region="Туркестанская область" d="M817 574 L899 566 L941 571 L967 633 L953 699 L905 760 L846 731 L882 653 Z"/>
-              <path class="map-region" data-region="Жамбылская область" d="M942 568 L1034 561 L1090 565 L1120 625 L1095 689 L1036 704 L968 675 L969 630 Z"/>
-              <path class="map-region" data-region="Алматинская область" d="M1090 560 L1154 555 L1210 574 L1271 618 L1265 686 L1210 714 L1146 698 L1097 687 L1118 625 Z"/>
-              <path class="map-region" data-region="Область Жетісу" d="M1127 489 L1186 474 L1246 493 L1308 533 L1287 608 L1260 635 L1208 575 L1153 555 L1117 528 Z"/>
-              <path class="map-region" data-region="Область Абай" d="M1148 366 L1213 325 L1273 342 L1321 393 L1309 464 L1250 498 L1185 475 L1122 491 L1118 425 Z"/>
-              <path class="map-region" data-region="Восточно-Казахстанская область" d="M1272 340 L1324 306 L1372 326 L1394 373 L1367 421 L1311 465 L1319 393 Z"/>
-              <circle class="map-region map-city" data-region="г. Астана" cx="946" cy="357" r="24"/>
-              <circle class="map-region map-city" data-region="г. Алматы" cx="1216" cy="663" r="24"/>
-              <circle class="map-region map-city" data-region="г. Шымкент" cx="856" cy="681" r="24"/>
-            </svg>
-            <div class="map-tooltip" role="status" aria-live="polite" hidden>
-              <strong class="map-tooltip-title"></strong>
-              <div class="map-tooltip-content"></div>
-              <a class="map-tooltip-source" href="https://app.powerbi.com/view?r=eyJrIjoiYWIxNGIwMmMtNmQxMS00MWIwLTllMGYtNzQ3NzI0MWY1Mzk3IiwidCI6IjQ0YWY2MTM1LTFmMTYtNGU3ZS04MzViLTAwYWY1MTdkZTNmNyIsImMiOjl9" target="_blank" rel="noopener noreferrer">Power BI · обновлено 19.11.2026</a>
-            </div>
-          </div>
-        </div>
-      </div>
+    <section id="about" class="licenses-hero" aria-label="Карта Казахстана">
+      <iframe class="licenses-frame" src="kazakhstan-licenses-map.html" title="Қазақстанның интерактивті картасы"></iframe>
     </section>
 
     <section class="section capabilities" id="resources">
@@ -155,6 +130,28 @@
     <div class="container footer-bottom"><span>© 2026 Bilim AI</span><span>Черновой каркас сайта</span></div>
   </footer>
   <script src="script.js?v=20261119-3"></script>
+  <script>
+    (() => {
+      const frame = document.querySelector('.licenses-frame');
+      let observer;
+
+      function fitMap() {
+        observer?.disconnect();
+        const map = frame.contentDocument?.querySelector('main');
+        if (!map) return;
+
+        const resize = () => {
+          frame.style.height = Math.ceil(map.getBoundingClientRect().height) + 'px';
+        };
+        resize();
+        observer = new ResizeObserver(resize);
+        observer.observe(map);
+      }
+
+      frame.addEventListener('load', fitMap);
+      fitMap();
+    })();
+  </script>
 </body>
 </html>
 
