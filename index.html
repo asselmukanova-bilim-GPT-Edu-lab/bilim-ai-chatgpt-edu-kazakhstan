@@ -10,17 +10,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Noto+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="assets/bilim-ai-logo-symbol.png">
   <link rel="stylesheet" href="styles.css?v=20261119-10">
+  <link rel="stylesheet" href="responsive.css?v=20261126">
   <style>
     .licenses-hero { background: #f9faff; }
     .capability-grid .feature-card { min-height: 0; }
     .licenses-frame {
       display: block;
       width: 100%;
-      height: calc(60.2vw + 3rem);
+      height: calc(min(60.2vw, 54rem) + 3rem);
       border: 0;
     }
     @media (max-width: 650px) {
-      .licenses-frame { height: calc(60.2vw + 8rem); }
+      .licenses-frame { height: calc(60.2vw + 10rem); }
     }
   </style>
 </head>
@@ -43,7 +44,7 @@
 
   <main id="top">
     <section id="about" class="licenses-hero" aria-label="Карта Казахстана">
-      <iframe class="licenses-frame" src="kazakhstan-licenses-map.html" title="Қазақстанның интерактивті картасы"></iframe>
+      <iframe class="licenses-frame" src="kazakhstan-licenses-map.html?v=20261126" title="Қазақстанның интерактивті картасы"></iframe>
     </section>
 
     <section class="section capabilities" id="resources">
@@ -155,4 +156,3 @@
   </script>
 </body>
 </html>
-

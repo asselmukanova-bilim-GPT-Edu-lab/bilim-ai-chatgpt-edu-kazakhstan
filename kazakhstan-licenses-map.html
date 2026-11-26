@@ -34,7 +34,7 @@ main{width:100%;margin:0}
 
 .bottom{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:10px 18px}
 .stage{position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 18% 32%,#dafaff 0,transparent 60%),radial-gradient(ellipse at 86% 82%,#e7ddff 0,transparent 58%),linear-gradient(135deg,#f8faff,#f1f4ff)}
-svg{display:block;width:100%;height:auto}
+svg{display:block;width:100%;height:auto;max-height:54rem}
 .face{cursor:pointer;stroke:#e9ffff;stroke-opacity:.83;stroke-width:1.25;stroke-linejoin:round;vector-effect:non-scaling-stroke;outline:none;transition:filter .15s,stroke .15s}
 .face.active,.face:focus-visible{stroke:#fff;stroke-width:2.5;filter:brightness(1.13) saturate(1.13)}
 .depth,.label,.cityDot{pointer-events:none}
@@ -50,13 +50,37 @@ svg{display:block;width:100%;height:auto}
 a{color:#3531a0;text-underline-offset:2px}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 [hidden]{display:none!important}
-@media(max-width:650px){.map-frame{padding-top:36px}.areaLabel{display:none}.details{top:8px;left:10px}.details strong{font-size:12px}.details p{font-size:11px}}
+.region-picker{display:none}
+@media(max-width:650px){
+  .region-picker{
+    display:grid;gap:.3rem;padding:.8rem 1rem 0;
+    font-weight:650;
+  }
+  .region-picker select{
+    width:100%;min-width:0;min-height:44px;padding:.45rem .65rem;
+    border:1px solid #bfc9ea;border-radius:.75rem;
+    color:var(--ink);background:#fff;font:inherit;font-size:1rem;
+  }
+  .areaLabel,.cityLabel{display:none}
+  .details{
+    position:static;max-width:none;margin:0 1rem 1rem;padding:.75rem;
+    border:1px solid #d8dffa;border-radius:.75rem;background:#fff;text-shadow:none;
+  }
+  .details p{font-size:.875rem}
+  .details p span{display:inline-block}
+}
 @media(prefers-reduced-motion:reduce){.face{transition:none}}
 </style>
 </head>
 <body>
 <main>
   <section class="stage" aria-label="Қазақстанның интерактивті картасы">
+    <label class="region-picker" for="map-region-picker">
+      Өңірді таңдаңыз
+      <select id="map-region-picker">
+        <option value="">Өңір таңдалмаған</option>
+      </select>
+    </label>
     <div class="map-frame">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="-13 -24 628 378" role="group" aria-label="Қазақстан">
         <defs id="defs">
@@ -201,6 +225,7 @@ const details = document.querySelector('#details');
 const formatter = new Intl.NumberFormat('kk-KZ');
 const cityIds = new Set(['KZ71', 'KZ75', 'KZ79']);
 const areas = new Map();
+const regionPicker = document.getElementById('map-region-picker');
 const palette = [
   ['#76eaf9','#20a9ed','#3260dc'],
   ['#51d7f8','#218bee','#4547ec'],
@@ -250,10 +275,12 @@ function bind(node, id) {
 function pick(id) {
   hovered = focused = null;
   pinned = pinned === id ? null : id;
+  regionPicker.value = pinned || '';
   render(true);
 }
 
 for (const [id, name, short, path, x, y] of regions) {
+  regionPicker.add(new Option(name, id));
   const city = cityIds.has(id);
   let node;
   if (city) {
@@ -310,8 +337,16 @@ function applyReadings(next) {
   render();
 }
 
+regionPicker.addEventListener('change', () => {
+  hovered = focused = null;
+  pinned = regionPicker.value || null;
+  render(true);
+});
 document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') { hovered = focused = pinned = null; render(); }
+  if (event.key !== 'Escape') return;
+  hovered = focused = pinned = null;
+  regionPicker.value = '';
+  render();
 });
 applyReadings(snapshot);
 const reportEndpoint = 'https://wabi-west-europe-api.analysis.windows.net/public/reports/querydata?synchronous=true';

@@ -23,3 +23,96 @@
 html[lang="kk"] .interactive-lesson-layout{grid-template-columns:570px minmax(0,1fr);gap:30px}html[lang="kk"] .interactive-lesson h1{font-size:36px}html[lang="kk"] .lesson-actions{gap:16px}html[lang="kk"] .lesson-actions section{padding-bottom:12px}html[lang="kk"] .lesson-actions h2{font-size:23px;margin-bottom:8px}html[lang="kk"] .lesson-actions p{font-size:21px;line-height:1.35}
 .contacts-layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:36px;align-items:center}.contact-cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}.contact-card{display:flex;gap:13px;align-items:flex-start;padding:19px 16px;background:#ffffffd4;border:1px solid #ced7eb;border-radius:14px;text-decoration:none;color:var(--ink);min-height:137px;overflow-wrap:anywhere}.contact-card:last-child{grid-column:1/-1;min-height:110px}.contact-card:hover{background:#eef1ff}.contact-icon{font-size:28px;color:#3436d0;width:32px;flex:none}.contact-card h2{font-size:21px;line-height:1.25;color:#292c9a;margin:0 0 9px}.contact-card strong{font-size:17px;line-height:1.3}.contact-card p{font-size:16px;line-height:1.4;color:#596981;margin-top:7px}.contact-feedback{text-align:center;background:#ffffffd4;border:1px solid #ced7eb;border-radius:18px;padding:20px}.contact-feedback h2{font-size:25px;line-height:1.25;color:#292c9a;margin-bottom:10px}.contact-feedback>p{font-size:18px;line-height:1.4}.contact-qr{display:block;width:250px;height:250px;margin:13px auto 7px;background:white}.contact-qr img{width:100%;height:100%;object-fit:contain}.contact-scan{font-size:14px;color:#596981;display:block}.contact-form{display:inline-block;margin-top:14px;background:#3335ec;color:white;border-radius:8px;padding:11px 16px;font-size:17px;text-decoration:none}
 .agenda-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px 28px}.agenda-grid section{display:flex;gap:14px;min-height:180px;padding:22px 0 12px;border-top:2px solid #bbc5df}.agenda-number{font-size:34px;line-height:1.1;font-weight:750;color:#3436ed;flex:none}.agenda-grid h2{font-size:24px;line-height:1.25;color:#25288f;margin:0 0 12px}.agenda-grid p{font-size:21px;line-height:1.4}.route .content{justify-content:center!important}
+
+/* Readable slide layout on phones, tablets, and short windows. */
+.appbar nav,
+.viewerbar { flex-wrap: wrap; }
+.appbar nav a { align-self: center; }
+.appbar nav :is(a, button), .controls button, dialog .close,
+#menuItems button, .viewerbar :is(a, button) {
+  min-height: 44px;
+}
+.appbar nav a, .viewerbar a { display: inline-flex; align-items: center; }
+dialog { overflow-wrap: anywhere; }
+
+@media screen and (max-width: 58rem), screen and (max-height: 38rem) {
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+  .appbar {
+    height: auto;
+    flex-wrap: wrap;
+    gap: .55rem 1rem;
+    padding: .65rem clamp(.75rem, 3vw, 1.5rem);
+  }
+  .appbar nav { gap: .375rem; }
+  .appbar nav :is(a, button) {
+    padding-inline: .5rem;
+    font-size: .8125rem;
+  }
+  #viewport {
+    display: block;
+    flex: 1;
+    height: auto;
+    overflow: visible;
+  }
+  #slide {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-width: 55rem;
+    margin-inline: auto;
+    padding: clamp(1rem, 4vw, 2rem);
+    transform: none !important;
+    overflow: visible;
+  }
+  #slide.plugin-screenshot h1 {
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+  .plugin-screen-layout {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    align-items: start;
+    gap: clamp(1rem, 3vw, 2rem);
+  }
+  .plugin-screen-button { width: 100%; height: auto; }
+  .plugin-screen-button img { max-height: 32rem; }
+  .plugin-screen-info { min-width: 0; }
+  .plugin-features { gap: 1rem; }
+  .plugin-features h2 { font-size: 1.0625rem; }
+  .plugin-summary, .plugin-features p, .plugin-example, .plugin-input-note {
+    font-size: 1rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  .controls {
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    min-height: 56px;
+    height: auto;
+    padding: .375rem .75rem max(.375rem, env(safe-area-inset-bottom));
+  }
+  dialog { padding: 1rem; }
+  dialog h2 { font-size: 1.25rem; }
+  #notesDialog :is(p, li) { font-size: 1rem; }
+  #interactiveLayer {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 70dvh;
+    margin: 0;
+    transform: none !important;
+  }
+  #slide[aria-hidden="true"] { display: none; }
+}
+
+@media screen and (max-width: 39rem) {
+  .plugin-screen-layout, .plugin-features { grid-template-columns: minmax(0, 1fr); }
+  .plugin-screen-info { grid-row: 1; }
+  .plugin-screen-button img { max-height: 20rem; }
+}
