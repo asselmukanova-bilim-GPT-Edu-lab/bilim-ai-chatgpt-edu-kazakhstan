@@ -38,39 +38,76 @@
       font-size: clamp(1.5rem, 3vw, 2.4rem);
       line-height: 1.2;
     }
-    .stats-section .stats-note {
-      border-inline-start: 3px solid #6f45ff;
-      border-radius: .4rem;
-      background: #f0ecff;
-      padding: .75rem .9rem;
-      color: var(--ink);
-    }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
-      gap: .65rem;
-      list-style: none;
-      margin: 0;
+    .stats-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem 1.25rem;
+      margin: .85rem 0 1rem;
       padding: 0;
+      list-style: none;
     }
-    .stats-region {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-content: start;
-      align-items: baseline;
-      gap: .3rem .6rem;
-      padding: .75rem .9rem;
+    .stats-legend li { display: flex; align-items: center; gap: .45rem; font-weight: 750; }
+    .stats-legend-marker { width: .85rem; height: .85rem; border-radius: .25rem; background: var(--series); }
+    .activation-series { --series: #b64700; }
+    .usage-series { --series: #005ca9; }
+    .regional-chart {
+      --region-column: clamp(10rem, 20vw, 16rem);
+      min-width: 0;
+      padding: clamp(.75rem, 2vw, 1.5rem);
       border: 1px solid var(--line);
-      border-radius: .9rem;
+      border-radius: 1rem;
       background: #fff;
     }
-    .stats-region strong { font-size: .95rem; line-height: 1.25; overflow-wrap: anywhere; }
-    .stats-value { color: #4d27cc; font-weight: 800; font-variant-numeric: tabular-nums; }
-    .stats-count { grid-column: 1 / -1; font-size: .875rem; color: var(--muted); }
-    .stats-region meter { grid-column: 1 / -1; width: 100%; height: .5rem; }
-    .stats-region meter::-webkit-meter-bar { border: 0; border-radius: .5rem; background: #eeeafa; }
-    .stats-region meter::-webkit-meter-optimum-value { border-radius: .5rem; background: #6f45ff; }
-    .stats-region meter::-moz-meter-bar { background: #6f45ff; }
+    .chart-axis, .chart-region {
+      display: grid;
+      grid-template-columns: var(--region-column) minmax(0, 1fr);
+      align-items: center;
+      gap: .85rem;
+    }
+    .chart-scale {
+      grid-column: 2;
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: .8rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .chart-regions { margin: .4rem 0 0; padding: 0; list-style: none; }
+    .chart-region { padding-block: .65rem; border-top: 1px solid var(--line); }
+    .chart-region-name { font-size: .95rem; line-height: 1.25; overflow-wrap: anywhere; }
+    .chart-bars { display: grid; gap: .3rem; min-width: 0; }
+    .chart-bar {
+      min-height: 1.6rem;
+      min-width: 0;
+      background: repeating-linear-gradient(to right, #ededf6 0 1px, transparent 1px 25%);
+      border-inline-end: 1px solid #ededf6;
+    }
+    .chart-fill {
+      position: relative;
+      container: bar / inline-size;
+      width: var(--bar-width);
+      height: 1.6rem;
+      border-radius: .28rem;
+      background: var(--series);
+    }
+    .chart-value {
+      position: absolute;
+      right: .45rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #fff;
+      white-space: nowrap;
+      font-size: .8rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+    @container bar (max-width: 3.75rem) {
+      .chart-value { right: auto; left: calc(100% + .35rem); color: var(--series); }
+    }
+    @media (max-width: 660px) {
+      .chart-axis, .chart-region { grid-template-columns: minmax(0, 1fr); gap: .35rem; }
+      .chart-scale { grid-column: 1; }
+    }
     .stats-report {
       display: block;
       width: 100%;
@@ -104,21 +141,20 @@
     <header>
       <h1 class="stats-heading">Статистика</h1>
       <p><span lang="ru">Лицензии ChatGPT Edu по регионам Казахстана</span><span lang="kk">Қазақстан өңірлеріндегі ChatGPT Edu лицензиялары</span></p>
-      <p id="stats-date" class="stats-date"></p>
+      <p id="stats-date" class="stats-date" aria-live="polite"></p>
       <a class="stats-link" href="#power-bi"><span lang="ru">Перейти к отчёту Power BI</span><span lang="kk">Power BI есебіне өту</span></a>
     </header>
 
-    <section class="stats-section" aria-labelledby="activation-title">
-      <h2 id="activation-title"><span lang="ru">Активация по регионам</span><span lang="kk">Өңірлер бойынша белсендіру</span></h2>
-      <p><span lang="ru">Доля активированных лицензий от числа выделенных.</span><span lang="kk">Бөлінген лицензиялардың ішіндегі белсендірілген лицензиялардың үлесі.</span></p>
-      <p id="activation-note" class="stats-note" hidden><span lang="ru">Для расчёта процента нужно число выделенных лицензий по региону. Там, где оно неизвестно, указано число активаций.</span><span lang="kk">Пайызды есептеу үшін өңірге бөлінген лицензиялар саны қажет. Ол белгісіз болса, белсендірілген лицензиялар саны көрсетіледі.</span></p>
-      <ul id="activation-regions" class="stats-grid"></ul>
-    </section>
-
-    <section class="stats-section" aria-labelledby="usage-title">
-      <h2 id="usage-title"><span lang="ru">Использование по регионам</span><span lang="kk">Өңірлер бойынша пайдалану</span></h2>
-      <p><span lang="ru">Доля используемых лицензий среди активированных.</span><span lang="kk">Белсендірілген лицензиялардың ішіндегі пайдаланылып жатқан лицензиялардың үлесі.</span></p>
-      <ul id="usage-regions" class="stats-grid"></ul>
+    <section class="stats-section" aria-labelledby="chart-title">
+      <h2 id="chart-title"><span lang="ru">Активация и использование по регионам</span><span lang="kk">Өңірлер бойынша белсендіру және пайдалану</span></h2>
+      <ul class="stats-legend">
+        <li class="activation-series"><span class="stats-legend-marker" aria-hidden="true"></span><span lang="ru">Активировано</span><span lang="kk">Белсендірілген</span></li>
+        <li class="usage-series"><span class="stats-legend-marker" aria-hidden="true"></span><span lang="ru">Используется</span><span lang="kk">Пайдаланылып жатқан</span></li>
+      </ul>
+      <div class="regional-chart">
+        <div class="chart-axis" aria-hidden="true"><div id="chart-scale" class="chart-scale"></div></div>
+        <ul id="chart-regions" class="chart-regions"></ul>
+      </div>
     </section>
 
     <section class="stats-section" id="power-bi" aria-labelledby="report-title">
@@ -129,86 +165,86 @@
     </section>
   </main>
 
-  <script type="application/json" id="regional-statistics">
-{"asOf":"2026-11-25T12:46:42.881Z","regions":[
-{"id":"KZ10","ru":"Область Абай","kk":"Абай облысы","issued":null,"activated":2696,"used":2311},
-{"id":"KZ11","ru":"Акмолинская область","kk":"Ақмола облысы","issued":null,"activated":4941,"used":4416},
-{"id":"KZ15","ru":"Актюбинская область","kk":"Ақтөбе облысы","issued":null,"activated":4903,"used":4113},
-{"id":"KZ19","ru":"Алматинская область","kk":"Алматы облысы","issued":null,"activated":6614,"used":6504},
-{"id":"KZ23","ru":"Атырауская область","kk":"Атырау облысы","issued":null,"activated":2831,"used":2445},
-{"id":"KZ27","ru":"Западно-Казахстанская область","kk":"Батыс Қазақстан облысы","issued":null,"activated":5457,"used":5384},
-{"id":"KZ31","ru":"Жамбылская область","kk":"Жамбыл облысы","issued":null,"activated":5976,"used":5825},
-{"id":"KZ33","ru":"Область Жетісу","kk":"Жетісу облысы","issued":null,"activated":4167,"used":3675},
-{"id":"KZ35","ru":"Карагандинская область","kk":"Қарағанды облысы","issued":null,"activated":4549,"used":4081},
-{"id":"KZ39","ru":"Костанайская область","kk":"Қостанай облысы","issued":null,"activated":5577,"used":4761},
-{"id":"KZ43","ru":"Кызылординская область","kk":"Қызылорда облысы","issued":null,"activated":4954,"used":4853},
-{"id":"KZ47","ru":"Мангистауская область","kk":"Маңғыстау облысы","issued":null,"activated":2744,"used":2431},
-{"id":"KZ55","ru":"Павлодарская область","kk":"Павлодар облысы","issued":null,"activated":2764,"used":2383},
-{"id":"KZ59","ru":"Северо-Казахстанская область","kk":"Солтүстік Қазақстан облысы","issued":null,"activated":2598,"used":2216},
-{"id":"KZ61","ru":"Туркестанская область","kk":"Түркістан облысы","issued":null,"activated":13567,"used":13038},
-{"id":"KZ62","ru":"Область Ұлытау","kk":"Ұлытау облысы","issued":null,"activated":1195,"used":983},
-{"id":"KZ63","ru":"Восточно-Казахстанская область","kk":"Шығыс Қазақстан облысы","issued":null,"activated":1873,"used":1664},
-{"id":"KZ71","ru":"г. Астана","kk":"Астана қаласы","issued":null,"activated":5261,"used":4635},
-{"id":"KZ75","ru":"г. Алматы","kk":"Алматы қаласы","issued":null,"activated":4848,"used":4422},
-{"id":"KZ79","ru":"г. Шымкент","kk":"Шымкент қаласы","issued":null,"activated":3107,"used":3056}
-]}
-  </script>
-  <script>
-    (() => {
-      const stats = JSON.parse(document.getElementById('regional-statistics').textContent);
-      const labels = {
-        ru: {date:'Снимок Power BI от', unknown:'Доля неизвестна', activated:'активировано', used:'используется', of:' из '},
-        kk: {date:'Power BI деректерінің күні', unknown:'Үлесі белгісіз', activated:'белсендірілді', used:'пайдаланылып жатыр', of:' / '}
-      };
-      const validCount = value => Number.isSafeInteger(value) && value >= 0;
-      function ratio(numerator, denominator) {
-        if (!validCount(numerator) || !validCount(denominator) || denominator === 0 || numerator > denominator) return null;
-        return numerator / denominator;
+  <script type="module">
+    import { regionalNames, subscribeRegionalLicenses } from './regional-licenses.js?v=20261127-1';
+
+    const chart = document.getElementById('chart-regions');
+    const status = document.getElementById('stats-date');
+    const scale = document.getElementById('chart-scale');
+    const translations = {
+      ru: {
+        activated: 'Активировано', used: 'Используется', unavailable: 'нет данных',
+        snapshot: 'Сохранённые данные Power BI', live: 'Данные Power BI',
+        cached: 'Показаны последние доступные данные Power BI'
+      },
+      kk: {
+        activated: 'Белсендірілген', used: 'Пайдаланылып жатқан', unavailable: 'дерек жоқ',
+        snapshot: 'Power BI жүйесінен сақталған деректер', live: 'Power BI деректері',
+        cached: 'Power BI жүйесіндегі соңғы қолжетімді деректер көрсетілген'
+      }
+    };
+    let reading;
+
+    function renderChart() {
+      if (!reading) return;
+      const language = document.documentElement.lang === 'kk' ? 'kk' : 'ru';
+      const locale = language === 'kk' ? 'kk-KZ' : 'ru-RU';
+      const copy = translations[language];
+      const counts = new Intl.NumberFormat(locale);
+      const date = new Intl.DateTimeFormat(locale, {
+        dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Qyzylorda'
+      });
+      document.title = 'Статистика — Bilim AI';
+      status.textContent = copy[reading.state] + ' · ' + date.format(new Date(reading.checkedAt));
+
+      const available = Object.values(reading.counts).flatMap(row => [row.activated, row.used]);
+      const maximum = Math.max(100, Math.ceil(Math.max(0, ...available) / 100) * 100);
+      const ticks = Array.from({length: 5}, (_, index) => {
+        const tick = document.createElement('span');
+        tick.textContent = counts.format(maximum * index / 4);
+        return tick;
+      });
+      scale.replaceChildren(...ticks);
+
+      function bar(key, count) {
+        const meter = document.createElement('div');
+        meter.className = 'chart-bar ' + (key === 'activated' ? 'activation-series' : 'usage-series');
+        meter.setAttribute('role', 'img');
+        const label = count === null ? '—' : counts.format(count);
+        meter.setAttribute('aria-label', copy[key] + ': ' + (count === null ? copy.unavailable : label));
+        const fill = document.createElement('div');
+        fill.className = 'chart-fill';
+        fill.style.setProperty('--bar-width', (count ?? 0) / maximum * 100 + '%');
+        const value = document.createElement('span');
+        value.className = 'chart-value';
+        value.textContent = label;
+        value.setAttribute('aria-hidden', 'true');
+        fill.append(value);
+        meter.append(fill);
+        return meter;
       }
 
-      function render() {
-        const language = document.documentElement.lang === 'kk' ? 'kk' : 'ru';
-        const locale = language === 'kk' ? 'kk-KZ' : 'ru-RU';
-        const copy = labels[language];
-        const number = new Intl.NumberFormat(locale);
-        const percent = new Intl.NumberFormat(locale, {style:'percent', maximumFractionDigits:1});
-        const date = new Intl.DateTimeFormat(locale, {dateStyle:'medium', timeZone:'Asia/Qyzylorda'});
-        document.title = 'Статистика — Bilim AI';
-        document.getElementById('stats-date').textContent = copy.date + ' ' + date.format(new Date(stats.asOf));
+      const sorted = regionalNames.slice().sort((a, b) => a[language].localeCompare(b[language], locale));
+      chart.replaceChildren(...sorted.map(region => {
+        const row = document.createElement('li');
+        row.className = 'chart-region';
+        const label = document.createElement('strong');
+        label.className = 'chart-region-name';
+        label.textContent = region[language];
+        const bars = document.createElement('div');
+        bars.className = 'chart-bars';
+        const { activated, used } = reading.counts[region.id];
+        bars.append(bar('activated', activated), bar('used', used));
+        row.append(label, bars);
+        return row;
+      }));
+    }
 
-        function tile(row, numerator, denominator, caption) {
-          const share = ratio(numerator, denominator);
-          const item = document.createElement('li');
-          item.className = 'stats-region';
-          const name = document.createElement('strong');
-          name.textContent = row[language];
-          const value = document.createElement('span');
-          value.className = 'stats-value';
-          value.textContent = share === null ? '—' : percent.format(share);
-          if (share === null) value.setAttribute('aria-label', copy.unknown);
-          const count = document.createElement('span');
-          count.className = 'stats-count';
-          count.textContent = validCount(numerator) ? number.format(numerator) + (validCount(denominator) ? copy.of + number.format(denominator) : '') + ' · ' + caption : '—';
-          item.append(name, value, count);
-          if (share !== null) {
-            const meter = document.createElement('meter');
-            meter.max = 1;
-            meter.value = share;
-            meter.setAttribute('aria-hidden', 'true');
-            item.append(meter);
-          }
-          return item;
-        }
-
-        const regions = stats.regions.slice().sort((a, b) => a[language].localeCompare(b[language], locale));
-        document.getElementById('activation-regions').replaceChildren(...regions.map(row => tile(row, row.activated, row.issued, copy.activated)));
-        document.getElementById('usage-regions').replaceChildren(...regions.map(row => tile(row, row.used, row.activated, copy.used)));
-        document.getElementById('activation-note').hidden = regions.every(row => ratio(row.activated, row.issued) !== null);
-      }
-
-      new MutationObserver(render).observe(document.documentElement, {attributeFilter:['lang']});
-      render();
-    })();
+    new MutationObserver(renderChart).observe(document.documentElement, { attributeFilter: ['lang'] });
+    subscribeRegionalLicenses(next => {
+      reading = next;
+      renderChart();
+    });
   </script>
 </body>
 </html>
