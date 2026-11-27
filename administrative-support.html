@@ -23,16 +23,82 @@
       line-height: 1.12;
       overflow-wrap: anywhere;
     }
-    .presentation-directory {
-      margin-block-start: 1.5rem;
+    .presentation-directory { margin-block-start: clamp(1.6rem, 4vw, 3rem); }
+    .presentation-directory h2 { margin: 0 0 1rem; font-size: clamp(1.35rem, 3vw, 1.8rem); }
+    .presentation-empty {
       max-width: 52rem;
-      padding: clamp(1.25rem, 3vw, 2rem);
-      border: 1px solid var(--line);
-      border-radius: 1.1rem;
+      margin: 0;
+      padding: 1.35rem 1.5rem;
+      color: var(--muted);
+      border: 1px dashed #d9d2ee;
+      border-radius: 1rem;
       background: #fff;
     }
-    .presentation-directory h2 { margin: 0; font-size: clamp(1.25rem, 3vw, 1.6rem); }
-    .presentation-directory p { margin: .65rem 0 0; color: var(--muted); }
+    .presentation-shelf {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(1rem, 2.6vw, 2rem);
+    }
+    .presentation-card.video-card { min-width: 0; }
+    .presentation-card.video-card:hover { transform: none; }
+    .presentation-card .presentation-stage {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: #f3f0fb;
+      overflow: hidden;
+      touch-action: pan-y;
+    }
+    .presentation-stage > img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .presentation-stage .presentation-image-error {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 1rem;
+      text-align: center;
+      color: var(--muted);
+    }
+    .presentation-controls {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) 44px;
+      gap: .5rem;
+      align-items: center;
+      justify-items: center;
+      padding: .55rem .8rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .presentation-controls button {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #f5f2ff;
+      color: #4d27cc;
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+    .presentation-controls button[aria-disabled="true"] {
+      color: #645d7a;
+      background: #f6f5fa;
+      opacity: .68;
+      cursor: default;
+    }
+    .presentation-controls output { font-size: .875rem; color: var(--muted); text-align: center; }
+    .presentation-card .video-card-copy { padding: clamp(.9rem, 2vw, 1.4rem); }
+    .presentation-card h3 { margin: 0; font-size: clamp(1rem, 2vw, 1.25rem); overflow-wrap: anywhere; }
+    .presentation-card p { margin: .45rem 0 0; color: var(--muted); overflow-wrap: anywhere; }
+    .presentation-card :focus-visible { outline: 3px solid #6f45ff; outline-offset: 2px; }
+    .presentation-stage:focus-visible { outline-offset: -4px; }
+    .admin-support-page [hidden] { display: none !important; }
+    @media (max-width: 760px) {
+      .presentation-shelf { grid-template-columns: minmax(0, 1fr); }
+    }
   </style>
 </head>
 <body class="admin-support-page">
@@ -53,19 +119,11 @@
     <h1><span lang="ru">Методическая поддержка</span><span lang="kk">Әдістемелік қолдау</span></h1>
     <section class="presentation-directory" aria-labelledby="presentations-title">
       <h2 id="presentations-title"><span lang="ru">Презентации</span><span lang="kk">Презентациялар</span></h2>
-      <p><span lang="ru">Ссылки на презентации для администрации появятся здесь.</span><span lang="kk">Әкімшілікке арналған презентациялардың сілтемелері осында жарияланады.</span></p>
+      <p class="presentation-empty" id="presentation-empty"><span lang="ru">Презентации скоро появятся в этом разделе.</span><span lang="kk">Бұл бөлімде жақында презентациялар жарияланады.</span></p>
+      <div class="presentation-shelf" id="presentation-shelf" hidden></div>
     </section>
   </main>
   <script src="script.js?v=20261119-3"></script>
-  <script>
-    (() => {
-      const updateTitle = () => {
-        const title = document.documentElement.lang === 'kk' ? 'Әдістемелік қолдау' : 'Методическая поддержка';
-        document.title = title + ' — Bilim AI';
-      };
-      new MutationObserver(updateTitle).observe(document.documentElement, { attributeFilter: ['lang'] });
-      updateTitle();
-    })();
-  </script>
+  <script type="module" src="presentation-gallery.js?v=20261127-1"></script>
 </body>
 </html>
