@@ -111,7 +111,9 @@ a{color:#3531a0;text-underline-offset:2px}
     <span><a id="report" href="https://app.powerbi.com/view?r=eyJrIjoiYWIxNGIwMmMtNmQxMS00MWIwLTllMGYtNzQ3NzI0MWY1Mzk3IiwidCI6IjQ0YWY2MTM1LTFmMTYtNGU3ZS04MzViLTAwYWY1MTdkZTNmNyIsImMiOjl9&amp;pageName=b29b129cdeed528605f2" target="_blank" rel="noopener">Дереккөз · Power BI</a> · <a href="https://github.com/galymorg/new_qazaqstan_GeoJSON" target="_blank" rel="noopener">Облыс шекаралары</a></span>
   </div>
 </main>
-<script>
+<script type="module">
+import { subscribeRegionalLicenses } from './regional-licenses.js?v=20261127-1';
+
 const regions = [
   ["KZ10","Абай облысы","Абай облысы","M 487.6 186.2 L 482.2 180.2 L 475.6 181.6 L 474.7 179.8 L 467.3 176.3 L 465.3 179.6 L 463.2 177.7 L 461.3 180.4 L 453.7 180.8 L 452.3 183.4 L 446.3 180.1 L 447.5 176.4 L 450.4 176.5 L 448.3 171.2 L 451.1 164.1 L 450.2 163.0 L 452.7 161.7 L 448.1 159.7 L 449.8 157.6 L 446.9 157.7 L 444.7 155.4 L 450.5 150.2 L 450.7 146.9 L 450.0 145.2 L 444.2 146.7 L 443.0 142.5 L 445.7 141.5 L 438.0 134.6 L 438.1 133.3 L 444.9 129.7 L 446.2 126.5 L 445.7 121.9 L 449.4 120.2 L 452.4 115.3 L 460.5 117.8 L 464.6 117.0 L 467.2 111.2 L 465.2 108.2 L 465.0 103.4 L 462.2 104.1 L 461.8 101.8 L 458.1 99.7 L 455.5 95.4 L 464.2 90.0 L 463.0 87.1 L 466.0 86.7 L 466.8 83.6 L 470.4 80.6 L 483.2 99.5 L 482.8 97.5 L 484.5 97.6 L 484.3 96.0 L 487.8 94.0 L 486.6 89.1 L 489.0 88.7 L 489.4 86.4 L 495.2 88.4 L 496.0 87.5 L 496.1 93.3 L 500.4 91.8 L 501.8 96.4 L 504.1 96.2 L 506.8 100.9 L 507.3 107.1 L 502.2 105.8 L 502.8 107.8 L 500.2 107.9 L 499.6 109.9 L 503.1 110.3 L 503.3 113.6 L 508.4 114.9 L 509.2 118.9 L 513.3 121.0 L 515.4 124.1 L 519.8 125.9 L 520.8 124.7 L 523.2 127.2 L 524.9 126.5 L 525.8 130.6 L 529.3 132.0 L 528.3 135.8 L 529.7 135.8 L 529.3 134.4 L 530.4 136.3 L 533.4 135.0 L 531.7 138.1 L 533.3 138.1 L 533.6 136.7 L 541.5 141.9 L 534.0 153.1 L 534.7 156.5 L 539.5 162.4 L 539.7 167.3 L 537.7 168.7 L 532.9 206.6 L 531.0 206.5 L 529.8 202.3 L 525.0 195.7 L 518.8 191.3 L 519.2 189.1 L 518.4 190.1 L 512.3 188.0 L 507.6 188.5 L 494.3 182.8 L 487.6 186.2 Z",490.7,144.8,"Область Абай"],
   ["KZ11","Ақмола облысы","Ақмола облысы","M 357.4 116.9 L 356.4 121.6 L 355.3 119.9 L 352.3 121.3 L 352.8 124.3 L 348.1 126.4 L 347.2 124.4 L 348.5 122.6 L 347.0 121.0 L 340.1 122.5 L 340.4 120.7 L 337.6 118.5 L 335.7 119.5 L 336.2 121.0 L 334.0 121.2 L 334.1 123.3 L 327.4 122.4 L 329.7 109.8 L 325.5 109.9 L 320.3 113.5 L 316.3 112.7 L 317.3 115.2 L 315.6 116.4 L 306.4 119.1 L 304.5 116.1 L 306.1 115.2 L 305.3 112.9 L 300.8 113.4 L 294.6 111.6 L 294.0 108.7 L 291.8 109.1 L 291.4 107.0 L 289.0 105.4 L 288.1 108.2 L 285.4 108.4 L 286.0 103.1 L 283.1 98.0 L 285.0 96.4 L 285.7 92.6 L 282.5 87.6 L 288.2 86.2 L 291.3 79.1 L 291.6 73.9 L 293.7 74.1 L 294.6 76.5 L 299.1 75.4 L 299.2 77.4 L 309.6 79.0 L 309.6 74.5 L 312.5 74.4 L 316.9 77.8 L 319.9 74.4 L 318.8 72.0 L 323.2 70.8 L 324.3 68.4 L 328.5 66.0 L 327.4 64.8 L 329.6 60.9 L 329.3 58.1 L 325.2 53.2 L 327.5 51.8 L 327.3 50.0 L 329.2 50.1 L 328.9 48.3 L 334.4 47.5 L 337.0 51.3 L 337.4 48.1 L 342.4 47.0 L 342.9 51.2 L 346.2 51.1 L 344.9 54.1 L 348.2 53.7 L 349.7 56.8 L 352.3 53.1 L 357.8 52.9 L 357.8 54.8 L 360.0 55.6 L 365.0 53.6 L 367.8 57.3 L 366.5 61.1 L 367.4 63.4 L 374.5 63.5 L 375.2 61.9 L 381.9 60.5 L 383.3 67.0 L 385.0 66.3 L 389.4 67.3 L 391.7 69.7 L 397.7 70.2 L 398.9 84.1 L 395.9 86.4 L 396.0 90.4 L 398.5 89.0 L 402.3 91.3 L 396.3 94.4 L 394.8 97.7 L 388.8 97.9 L 390.0 101.6 L 391.2 100.3 L 393.8 101.1 L 386.2 107.0 L 384.0 106.2 L 382.1 109.7 L 378.8 111.0 L 378.2 112.5 L 379.8 113.4 L 375.4 114.3 L 375.1 117.3 L 373.3 116.0 L 369.1 116.8 L 370.9 111.5 L 366.9 109.2 L 357.4 116.9 Z M 365.7 106.6 L 369.0 102.8 L 368.5 102.6 L 368.6 102.1 L 367.6 101.9 L 366.9 99.0 L 364.0 98.6 L 363.0 100.1 L 362.3 100.0 L 362.4 104.1 L 365.7 106.6 Z M 368.7 102.6 L 368.7 102.6 L 368.7 102.6 L 368.7 102.6 Z M 367.5 97.9 L 368.3 97.6 L 368.3 97.4 L 367.5 97.9 Z M 369.3 101.8 L 369.5 101.4 L 368.9 101.4 L 369.3 101.8 Z M 364.1 108.0 L 364.2 107.6 L 364.1 107.6 L 364.1 108.0 Z M 363.4 99.3 L 362.9 99.3 L 363.0 99.5 L 363.4 99.3 Z",343.6,88.3,"Акмолинская область"],
@@ -134,88 +136,6 @@ const regions = [
   ["KZ75","Алматы қаласы","Алматы қаласы","M 459.4 271.2 L 454.4 269.0 L 453.5 265.7 L 457.3 263.4 L 459.1 263.7 L 457.8 266.4 L 460.3 268.0 L 458.9 268.5 L 459.4 271.2 Z M 459.5 264.0 L 460.2 264.3 L 459.9 264.7 L 459.5 264.0 Z",457,267.5,"Алматы"],
   ["KZ79","Шымкент қаласы","Шымкент қаласы","M 346.5 293.6 L 340.4 297.3 L 337.1 294.7 L 336.6 291.8 L 340.2 289.3 L 343.2 290.2 L 346.5 293.6 Z",341.1,293.1,"Шымкент"]
 ];
-const snapshot = {
-  "KZ11": {
-    "activated": 4941,
-    "used": 4416
-  },
-  "KZ15": {
-    "activated": 4903,
-    "used": 4113
-  },
-  "KZ19": {
-    "activated": 6614,
-    "used": 6504
-  },
-  "KZ23": {
-    "activated": 2831,
-    "used": 2445
-  },
-  "KZ63": {
-    "activated": 1873,
-    "used": 1664
-  },
-  "KZ75": {
-    "activated": 4848,
-    "used": 4422
-  },
-  "KZ71": {
-    "activated": 5261,
-    "used": 4635
-  },
-  "KZ79": {
-    "activated": 3107,
-    "used": 3056
-  },
-  "KZ31": {
-    "activated": 5976,
-    "used": 5825
-  },
-  "KZ27": {
-    "activated": 5457,
-    "used": 5384
-  },
-  "KZ35": {
-    "activated": 4549,
-    "used": 4081
-  },
-  "KZ39": {
-    "activated": 5577,
-    "used": 4761
-  },
-  "KZ43": {
-    "activated": 4954,
-    "used": 4853
-  },
-  "KZ47": {
-    "activated": 2744,
-    "used": 2431
-  },
-  "KZ10": {
-    "activated": 2696,
-    "used": 2311
-  },
-  "KZ33": {
-    "activated": 4167,
-    "used": 3675
-  },
-  "KZ62": {
-    "activated": 1195,
-    "used": 983
-  },
-  "KZ55": {
-    "activated": 2764,
-    "used": 2383
-  },
-  "KZ59": {
-    "activated": 2598,
-    "used": 2216
-  },
-  "KZ61": {
-    "activated": 13567,
-    "used": 13038
-  }
-};
 const svg = document.querySelector('svg');
 const defs = document.querySelector('#defs');
 const faces = document.querySelector('#faces');
@@ -234,7 +154,7 @@ const palette = [
   ['#598bff','#3c37ee','#3022cf']
 ];
 let hovered, focused, pinned, current;
-let readings = snapshot;
+let readings = {};
 
 function svgNode(tag, attributes, parent) {
   const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -348,274 +268,6 @@ document.addEventListener('keydown', event => {
   regionPicker.value = '';
   render();
 });
-applyReadings(snapshot);
-const reportEndpoint = 'https://wabi-west-europe-api.analysis.windows.net/public/reports/querydata?synchronous=true';
-const reportKey = 'ab14b02c-6d11-41b0-9e0f-7477241f5397';
-const reportQuery = {
-  "version": "1.0.0",
-  "queries": [
-    {
-      "Query": {
-        "Commands": [
-          {
-            "SemanticQueryDataShapeCommand": {
-              "Query": {
-                "Version": 2,
-                "From": [
-                  {
-                    "Name": "v",
-                    "Entity": "Вводный модуль",
-                    "Type": 0
-                  },
-                  {
-                    "Name": "w",
-                    "Entity": "Workspace_use_append",
-                    "Type": 0
-                  },
-                  {
-                    "Name": "s",
-                    "Entity": "Весь список",
-                    "Type": 0
-                  }
-                ],
-                "Select": [
-                  {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Source": "v"
-                        }
-                      },
-                      "Property": "Весь список.NewColumn.Область"
-                    },
-                    "Name": "Область"
-                  },
-                  {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Source": "w"
-                        }
-                      },
-                      "Property": "Активировали лицензию"
-                    },
-                    "Name": "Workspace_use_append.Активировали лицензию"
-                  },
-                  {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Source": "w"
-                        }
-                      },
-                      "Property": "Используют лицензию"
-                    },
-                    "Name": "Workspace_use_append.Используют лицензию"
-                  }
-                ],
-                "Where": [
-                  {
-                    "Condition": {
-                      "Not": {
-                        "Expression": {
-                          "In": {
-                            "Expressions": [
-                              {
-                                "Column": {
-                                  "Expression": {
-                                    "SourceRef": {
-                                      "Source": "v"
-                                    }
-                                  },
-                                  "Property": "org_name"
-                                }
-                              }
-                            ],
-                            "Values": [
-                              [
-                                {
-                                  "Literal": {
-                                    "Value": "'ОВПО и НИИ'"
-                                  }
-                                }
-                              ],
-                              [
-                                {
-                                  "Literal": {
-                                    "Value": "'astanahub'"
-                                  }
-                                }
-                              ]
-                            ]
-                          }
-                        }
-                      }
-                    }
-                  },
-                  {
-                    "Condition": {
-                      "Not": {
-                        "Expression": {
-                          "In": {
-                            "Expressions": [
-                              {
-                                "Column": {
-                                  "Expression": {
-                                    "SourceRef": {
-                                      "Source": "v"
-                                    }
-                                  },
-                                  "Property": "Весь список.NewColumn.Область"
-                                }
-                              }
-                            ],
-                            "Values": [
-                              [
-                                {
-                                  "Literal": {
-                                    "Value": "null"
-                                  }
-                                }
-                              ]
-                            ]
-                          }
-                        }
-                      }
-                    }
-                  },
-                  {
-                    "Condition": {
-                      "Not": {
-                        "Expression": {
-                          "In": {
-                            "Expressions": [
-                              {
-                                "Column": {
-                                  "Expression": {
-                                    "SourceRef": {
-                                      "Source": "v"
-                                    }
-                                  },
-                                  "Property": "Весь список.Уровень"
-                                }
-                              }
-                            ],
-                            "Values": [
-                              [
-                                {
-                                  "Literal": {
-                                    "Value": "null"
-                                  }
-                                }
-                              ],
-                              [
-                                {
-                                  "Literal": {
-                                    "Value": "'АстанаХаб'"
-                                  }
-                                }
-                              ],
-                              [
-                                {
-                                  "Literal": {
-                                    "Value": "'ОВПО'"
-                                  }
-                                }
-                              ],
-                              [
-                                {
-                                  "Literal": {
-                                    "Value": "'НИИ'"
-                                  }
-                                }
-                              ]
-                            ]
-                          }
-                        }
-                      }
-                    }
-                  },
-                  {
-                    "Condition": {
-                      "Not": {
-                        "Expression": {
-                          "In": {
-                            "Expressions": [
-                              {
-                                "Column": {
-                                  "Expression": {
-                                    "SourceRef": {
-                                      "Source": "s"
-                                    }
-                                  },
-                                  "Property": "Уровень"
-                                }
-                              }
-                            ],
-                            "Values": [
-                              [
-                                {
-                                  "Literal": {
-                                    "Value": "'АстанаХаб'"
-                                  }
-                                }
-                              ],
-                              [
-                                {
-                                  "Literal": {
-                                    "Value": "'НИИ'"
-                                  }
-                                }
-                              ],
-                              [
-                                {
-                                  "Literal": {
-                                    "Value": "'ОВПО'"
-                                  }
-                                }
-                              ]
-                            ]
-                          }
-                        }
-                      }
-                    }
-                  }
-                ]
-              },
-              "Binding": {
-                "Primary": {
-                  "Groupings": [
-                    {
-                      "Projections": [
-                        0,
-                        1,
-                        2
-                      ]
-                    }
-                  ]
-                },
-                "DataReduction": {
-                  "DataVolume": 3,
-                  "Primary": {
-                    "Top": {
-                      "Count": 100
-                    }
-                  }
-                },
-                "Version": 1
-              },
-              "ExecutionMetricsKind": 1
-            }
-          }
-        ]
-      },
-      "QueryId": "regional-licenses"
-    }
-  ],
-  "cancelQueries": [],
-  "modelId": 10036122
-};
-const regionIds = new Map(regions.map(([id, , , , , , sourceName]) => [sourceName, id]));
 const dateFormat = new Intl.DateTimeFormat('kk-KZ', {
   timeZone:'Asia/Qyzylorda', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
 });
@@ -626,75 +278,15 @@ function showDate(label, checkedAt) {
   status.textContent = label + ' · ' + [parts.day, parts.month, parts.year].join('.') + ', ' + parts.hour + ':' + parts.minute;
 }
 
-function decodeReadings(response) {
-  const result = response.results?.[0]?.result?.data;
-  const series = result?.dsr?.DS?.[0];
-  const rows = series?.PH?.[0]?.DM0;
-  if (!Array.isArray(rows) || !Number.isFinite(Date.parse(result.timestamp))) {
-    throw new Error('Power BI did not return regional data');
-  }
-  const counts = Object.create(null);
-  let schema, previous = [];
-  for (const row of rows) {
-    schema = row.S || schema;
-    if (!schema || schema.length !== 3 || schema.map(column => column.N).join(',') !== 'G0,M0,M1') {
-      throw new Error('Unexpected regional data schema');
-    }
-    let position = 0;
-    const values = schema.map((column, index) => {
-      const flag = 1 << index;
-      if ((row.R || 0) & flag) return previous[index];
-      if ((row['Ø'] || 0) & flag) return null;
-      const value = row.C?.[position++];
-      return column.DN && value != null ? series.ValueDicts?.[column.DN]?.[value] : value;
-    });
-    previous = values;
-    const [name, activated, used] = values;
-    const id = regionIds.get(typeof name === 'string' ? name.replace(/^г\.\s*/iu, '').trim() : '');
-    if (!id || counts[id] || ![activated, used].every(value => value === null || isCount(value))) {
-      throw new Error('Unexpected regional row');
-    }
-    counts[id] = {activated, used};
-  }
-  if (Object.keys(counts).length !== regionIds.size) throw new Error('Regional data is incomplete');
-  return {counts, checkedAt:result.timestamp};
-}
-
-let checkedAt = '2026-11-25T12:46:42.881Z';
-showDate('Power BI деректерінің көшірмесі', checkedAt);
-let pending = false;
-async function refresh() {
-  if (pending || document.visibilityState === 'hidden') return;
-  pending = true;
-  try {
-    const response = await fetch(reportEndpoint, {
-      method:'POST',
-      credentials:'omit',
-      cache:'no-store',
-      headers:{
-        'Content-Type':'application/json',
-        'X-PowerBI-ResourceKey':reportKey,
-        'ActivityId':crypto.randomUUID(),
-        'RequestId':crypto.randomUUID()
-      },
-      body:JSON.stringify(reportQuery),
-      signal:AbortSignal.timeout(18000)
-    });
-    if (!response.ok) throw new Error('Power BI HTTP ' + response.status);
-    const next = decodeReadings(await response.json());
-    if (Date.parse(next.checkedAt) < Date.parse(checkedAt)) return;
-    applyReadings(next.counts);
-    checkedAt = next.checkedAt;
-    showDate('Power BI арқылы тексерілді', checkedAt);
-  } catch {
-    showDate('Соңғы алынған деректер', checkedAt);
-  } finally {
-    pending = false;
-  }
-}
-
-refresh();
-setInterval(refresh, 10 * 60 * 1000);
+const freshnessLabels = {
+  snapshot: 'Power BI деректерінің көшірмесі',
+  live: 'Power BI арқылы тексерілді',
+  cached: 'Соңғы алынған деректер'
+};
+subscribeRegionalLicenses(({ counts, checkedAt, state }) => {
+  applyReadings(counts);
+  showDate(freshnessLabels[state], checkedAt);
+});
 </script>
 </body>
 </html>
