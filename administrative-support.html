@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Административная поддержка — Bilim AI</title>
+  <title>Методическая поддержка — Bilim AI</title>
   <meta name="description" content="Презентации Bilim AI для администрации организаций образования.">
   <link rel="icon" type="image/png" href="assets/bilim-ai-logo-symbol.png">
   <link rel="stylesheet" href="styles.css?v=20261119-10">
@@ -50,7 +50,7 @@
     </div>
   </header>
   <main class="container admin-support-main">
-    <h1><span lang="ru">Административная поддержка</span><span lang="kk">Әкімшілік қолдау</span></h1>
+    <h1><span lang="ru">Методическая поддержка</span><span lang="kk">Әдістемелік қолдау</span></h1>
     <section class="presentation-directory" aria-labelledby="presentations-title">
       <h2 id="presentations-title"><span lang="ru">Презентации</span><span lang="kk">Презентациялар</span></h2>
       <p><span lang="ru">Ссылки на презентации для администрации появятся здесь.</span><span lang="kk">Әкімшілікке арналған презентациялардың сілтемелері осында жарияланады.</span></p>
@@ -60,7 +60,7 @@
   <script>
     (() => {
       const updateTitle = () => {
-        const title = document.documentElement.lang === 'kk' ? 'Әкімшілік қолдау' : 'Административная поддержка';
+        const title = document.documentElement.lang === 'kk' ? 'Әдістемелік қолдау' : 'Методическая поддержка';
         document.title = title + ' — Bilim AI';
       };
       new MutationObserver(updateTitle).observe(document.documentElement, { attributeFilter: ['lang'] });
