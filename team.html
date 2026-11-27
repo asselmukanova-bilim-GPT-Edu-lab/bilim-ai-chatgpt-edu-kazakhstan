@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>О нас — Bilim AI</title>
+  <meta name="description" content="Методисты Bilim Group, которые работают над проектом ChatGPT Edu для педагогов Казахстана.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Noto+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="assets/bilim-ai-logo-symbol.png">
+  <link rel="stylesheet" href="styles.css?v=20261119-10">
+  <link rel="stylesheet" href="responsive.css?v=20261126">
+  <style>
+    html[lang="ru"] .team-main [lang="kk"],
+    html[lang="kk"] .team-main [lang="ru"] { display: none; }
+
+    .team-main {
+      padding-block: clamp(2.5rem, 6vw, 5.5rem) clamp(3rem, 7vw, 6rem);
+      background: radial-gradient(ellipse at top right, #e2f5fc, transparent 45rem),
+                  linear-gradient(180deg, #f2effd, #faf9fd 35rem);
+    }
+    .team-main > .container { max-width: 76rem; }
+    .team-heading { margin-bottom: clamp(1.5rem, 4vw, 3rem); }
+    .team-heading h1 {
+      max-width: 18ch;
+      margin: 0;
+      font-size: clamp(2rem, 4.6vw, 4.125rem);
+      line-height: 1.08;
+      letter-spacing: -.04em;
+    }
+    .team-heading p {
+      max-width: 43rem;
+      margin: 1rem 0 0;
+      font-size: clamp(1rem, 1.5vw, 1.125rem);
+      color: var(--muted);
+    }
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+      gap: clamp(1rem, 2.25vw, 1.5rem);
+    }
+    .team-card {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 1.5rem;
+      background: #fff;
+      box-shadow: 0 8px 28px rgba(70, 42, 155, .07);
+      overflow: hidden;
+    }
+    .team-card img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 8 / 7;
+      object-fit: cover;
+      background: #efecfa;
+    }
+    .team-card-copy { padding: clamp(1.125rem, 2vw, 1.5rem); }
+    .team-card h2 {
+      margin: 0;
+      font-size: clamp(1.125rem, 2vw, 1.375rem);
+      line-height: 1.25;
+    }
+    .team-card-role {
+      margin: .45rem 0 .75rem;
+      color: #5835c0;
+      font-weight: 700;
+      font-size: .875rem;
+    }
+    .team-card-bio { margin: 0; color: var(--muted); }
+  </style>
+</head>
+<body class="team-page">
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Bilim AI — главная">
+        <img class="brand-logo brand-logo-dark" src="assets/bilim-ai-logo-dark.png" alt="Bilim AI">
+        <span class="brand-context"><span>ChatGPT EDU — МЕКТЕП</span><span>Kazakhstan</span></span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">Меню</button>
+      <nav id="main-nav" class="main-nav" aria-label="Основная навигация">
+        <a href="about.html">О проекте</a>
+        <a class="nav-current" href="team.html" aria-current="page">О нас</a>
+        <a href="index.html#community">Комьюнити</a>
+        <button class="nav-action lang-toggle" type="button" aria-label="Переключить сайт на казахский язык">Қаз</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="team-main">
+    <div class="container">
+      <div class="team-heading">
+        <h1><span lang="ru">Методисты Bilim Group</span><span lang="kk">Bilim Group әдіскерлері</span></h1>
+        <p><span lang="ru">Команда проекта ChatGPT Edu, которая помогает педагогам применять ИИ в образовании.</span><span lang="kk">ChatGPT Edu жобасының командасы педагогтерге жасанды интеллектіні білім беру үдерісінде қолдануға көмектеседі.</span></p>
+      </div>
+      <div class="team-grid">
+        <article class="team-card">
+          <img src="assets/team/bakhytzhan-duisenova.jpg" width="640" height="560" alt="">
+          <div class="team-card-copy">
+            <h2>Бахытжан Дуйсенова</h2>
+            <p class="team-card-role"><span lang="ru">ИИ-методист ChatGPT Edu</span><span lang="kk">ChatGPT Edu жобасының ЖИ әдіскері</span></p>
+            <p class="team-card-bio"><span lang="ru">Педагог и эксперт в образовании, автор учебных программ и учебников. Магистр в области управления образованием Nazarbayev University.</span><span lang="kk">Педагог, білім беру саласының сарапшысы, оқу бағдарламалары мен оқулықтардың авторы. Nazarbayev University университетінің білім беруді басқару саласындағы магистрі.</span></p>
+          </div>
+        </article>
+        <article class="team-card">
+          <img src="assets/team/assel-mukanova.jpg" width="640" height="560" alt="">
+          <div class="team-card-copy">
+            <h2>Асель Муканова</h2>
+            <p class="team-card-role"><span lang="ru">ИИ-методист ChatGPT Edu</span><span lang="kk">ChatGPT Edu жобасының ЖИ әдіскері</span></p>
+            <p class="team-card-bio"><span lang="ru">Учитель информатики и магистр педагогических наук. Разрабатывает цифровые образовательные продукты и авторские учебные программы.</span><span lang="kk">Информатика пәнінің мұғалімі, педагогика ғылымдарының магистрі. Цифрлық білім беру өнімдері мен авторлық оқу бағдарламаларын әзірлейді.</span></p>
+          </div>
+        </article>
+        <article class="team-card">
+          <img src="assets/team/sabina-erzhankyzy.jpg" width="640" height="560" alt="">
+          <div class="team-card-copy">
+            <h2>Сабина Ержанқызы</h2>
+            <p class="team-card-role"><span lang="ru">ИИ-методист ChatGPT Edu</span><span lang="kk">ChatGPT Edu жобасының ЖИ әдіскері</span></p>
+            <p class="team-card-bio"><span lang="ru">Педагог-эксперт и магистр естественных наук. Занимается Full Stack-разработкой и внедрением решений на основе ИИ в образование.</span><span lang="kk">Педагог-сарапшы, жаратылыстану ғылымдарының магистрі. Full Stack әзірлеумен айналысады және білім беру саласына ЖИ шешімдерін енгізеді.</span></p>
+          </div>
+        </article>
+        <article class="team-card">
+          <img src="assets/team/bukhar-elemesov.jpg" width="640" height="560" alt="" loading="lazy">
+          <div class="team-card-copy">
+            <h2>Бухар Елемесов</h2>
+            <p class="team-card-role"><span lang="ru">ИИ-методист ChatGPT Edu</span><span lang="kk">ChatGPT Edu жобасының ЖИ әдіскері</span></p>
+            <p class="team-card-bio"><span lang="ru">Магистр информатики, специалист по образовательным и цифровым проектам. Разрабатывает цифровые продукты и внедряет инструменты ИИ в учебный процесс.</span><span lang="kk">Информатика магистрі, білім беру және цифрлық жобалар маманы. Цифрлық өнімдер әзірлейді және оқу үдерісіне ЖИ құралдарын енгізеді.</span></p>
+          </div>
+        </article>
+        <article class="team-card">
+          <img src="assets/team/diana-amergalieva.jpg" width="640" height="560" alt="" loading="lazy">
+          <div class="team-card-copy">
+            <h2>Диана Амергалиева</h2>
+            <p class="team-card-role"><span lang="ru">ИИ-методист ChatGPT Edu</span><span lang="kk">ChatGPT Edu жобасының ЖИ әдіскері</span></p>
+            <p class="team-card-bio"><span lang="ru">Эксперт по критериальному оцениванию и соавтор системы оценивания для школ NIS. Разрабатывает спецификации и задания для формативного и суммативного оценивания по информатике.</span><span lang="kk">Критериалды бағалау сарапшысы, NIS мектептеріне арналған бағалау жүйесінің бірлескен авторы. Информатика пәнінен қалыптастырушы және жиынтық бағалауға арналған спецификациялар мен тапсырмалар әзірлейді.</span></p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </main>
+  <script src="script.js?v=20261127" defer></script>
+</body>
+</html>

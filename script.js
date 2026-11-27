@@ -17,6 +17,7 @@ nav?.addEventListener('click', (event) => {
 const ruToKk = {
   'Меню': 'Мәзір',
   'О проекте': 'Жоба туралы',
+  'О нас': 'Біз туралы',
   'Материалы': 'Материалдар',
   'Комьюнити': 'Қауымдастық',
   'Единое пространство': 'Біртұтас кеңістік',
@@ -291,6 +292,8 @@ function applyLanguage(language) {
 
   if (document.body.classList.contains('about-page')) {
     document.title = isKazakh ? 'Жоба туралы — Bilim AI' : 'О проекте — Bilim AI';
+  } else if (document.body.classList.contains('team-page')) {
+    document.title = isKazakh ? 'Біз туралы — Bilim AI' : 'О нас — Bilim AI';
   } else if (document.body.classList.contains('plugins-page')) {
     document.title = isKazakh ? 'Плагиндер — Bilim AI' : 'Плагины — Bilim AI';
   } else if (document.body.classList.contains('webinars-page')) {
