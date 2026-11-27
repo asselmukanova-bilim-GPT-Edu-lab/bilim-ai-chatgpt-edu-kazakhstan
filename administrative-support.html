@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Административная поддержка — Bilim AI</title>
+  <meta name="description" content="Презентации Bilim AI для администрации организаций образования.">
+  <link rel="icon" type="image/png" href="assets/bilim-ai-logo-symbol.png">
+  <link rel="stylesheet" href="styles.css?v=20261119-10">
+  <link rel="stylesheet" href="responsive.css?v=20261126">
+  <style>
+    html[lang="ru"] .admin-support-page [lang="kk"],
+    html[lang="kk"] .admin-support-page [lang="ru"] { display: none; }
+    .admin-support-page {
+      min-height: 100svh;
+      background: radial-gradient(ellipse at 88% 0, #eee9ff, transparent 49%), #f8f7fc;
+    }
+    .admin-support-main { padding-block: clamp(2.5rem, 7vw, 6rem); }
+    .admin-support-main h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: -.035em;
+      line-height: 1.12;
+      overflow-wrap: anywhere;
+    }
+    .presentation-directory {
+      margin-block-start: 1.5rem;
+      max-width: 52rem;
+      padding: clamp(1.25rem, 3vw, 2rem);
+      border: 1px solid var(--line);
+      border-radius: 1.1rem;
+      background: #fff;
+    }
+    .presentation-directory h2 { margin: 0; font-size: clamp(1.25rem, 3vw, 1.6rem); }
+    .presentation-directory p { margin: .65rem 0 0; color: var(--muted); }
+  </style>
+</head>
+<body class="admin-support-page">
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Bilim AI — главная">
+        <img class="brand-logo brand-logo-dark" src="assets/bilim-ai-logo-dark.png" alt="Bilim AI">
+        <span class="brand-context"><span>ChatGPT EDU — МЕКТЕП</span><span>Kazakhstan</span></span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">Меню</button>
+      <nav id="main-nav" class="main-nav" aria-label="Основная навигация">
+        <a href="index.html#resources"><span lang="ru">На главную</span><span lang="kk">Басты бетке</span></a>
+        <button class="nav-action lang-toggle" type="button" aria-label="Переключить сайт на казахский язык">Қаз</button>
+      </nav>
+    </div>
+  </header>
+  <main class="container admin-support-main">
+    <h1><span lang="ru">Административная поддержка</span><span lang="kk">Әкімшілік қолдау</span></h1>
+    <section class="presentation-directory" aria-labelledby="presentations-title">
+      <h2 id="presentations-title"><span lang="ru">Презентации</span><span lang="kk">Презентациялар</span></h2>
+      <p><span lang="ru">Ссылки на презентации для администрации появятся здесь.</span><span lang="kk">Әкімшілікке арналған презентациялардың сілтемелері осында жарияланады.</span></p>
+    </section>
+  </main>
+  <script src="script.js?v=20261119-3"></script>
+  <script>
+    (() => {
+      const updateTitle = () => {
+        const title = document.documentElement.lang === 'kk' ? 'Әкімшілік қолдау' : 'Административная поддержка';
+        document.title = title + ' — Bilim AI';
+      };
+      new MutationObserver(updateTitle).observe(document.documentElement, { attributeFilter: ['lang'] });
+      updateTitle();
+    })();
+  </script>
+</body>
+</html>
