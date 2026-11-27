@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Статистика — Bilim AI</title>
+  <meta name="description" content="Активация и использование лицензий ChatGPT Edu по регионам Казахстана.">
+  <link rel="icon" type="image/png" href="assets/bilim-ai-logo-symbol.png">
+  <link rel="stylesheet" href="styles.css?v=20261119-10">
+  <link rel="stylesheet" href="responsive.css?v=20261126">
+  <style>
+    .statistics-page { background: #f8f7fd; }
+    html[lang="ru"] .statistics-page [lang="kk"],
+    html[lang="kk"] .statistics-page [lang="ru"],
+    .statistics-page [hidden] { display: none !important; }
+
+    .stats-main { padding-block: clamp(2rem, 5vw, 4rem); }
+    .stats-heading {
+      margin: 0;
+      font-size: clamp(2.5rem, 6vw, 4.75rem);
+      line-height: 1.06;
+      letter-spacing: -.04em;
+    }
+    .stats-main p { margin: .5rem 0 1rem; color: var(--muted); }
+    .stats-date { font-size: .875rem; }
+    .stats-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      color: #4d27cc;
+      font-weight: 800;
+      text-decoration: underline;
+      text-underline-offset: .2em;
+    }
+    .stats-section { margin-block-start: clamp(2rem, 5vw, 4rem); }
+    .stats-section h2 {
+      margin: 0;
+      font-size: clamp(1.5rem, 3vw, 2.4rem);
+      line-height: 1.2;
+    }
+    .stats-section .stats-note {
+      border-inline-start: 3px solid #6f45ff;
+      border-radius: .4rem;
+      background: #f0ecff;
+      padding: .75rem .9rem;
+      color: var(--ink);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+      gap: .65rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .stats-region {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-content: start;
+      align-items: baseline;
+      gap: .3rem .6rem;
+      padding: .75rem .9rem;
+      border: 1px solid var(--line);
+      border-radius: .9rem;
+      background: #fff;
+    }
+    .stats-region strong { font-size: .95rem; line-height: 1.25; overflow-wrap: anywhere; }
+    .stats-value { color: #4d27cc; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .stats-count { grid-column: 1 / -1; font-size: .875rem; color: var(--muted); }
+    .stats-region meter { grid-column: 1 / -1; width: 100%; height: .5rem; }
+    .stats-region meter::-webkit-meter-bar { border: 0; border-radius: .5rem; background: #eeeafa; }
+    .stats-region meter::-webkit-meter-optimum-value { border-radius: .5rem; background: #6f45ff; }
+    .stats-region meter::-moz-meter-bar { background: #6f45ff; }
+    .stats-report {
+      display: block;
+      width: 100%;
+      height: clamp(26rem, 63vw, 55rem);
+      margin-top: .6rem;
+      border: 1px solid var(--line);
+      border-radius: .9rem;
+      background: #fff;
+    }
+    .statistics-page :focus-visible { outline: 3px solid #6f45ff; outline-offset: 3px; }
+  </style>
+  <script src="script.js?v=20261119-3" defer></script>
+</head>
+<body class="statistics-page">
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Bilim AI — главная">
+        <img class="brand-logo brand-logo-dark" src="assets/bilim-ai-logo-dark.png" alt="Bilim AI">
+        <span class="brand-context"><span>ChatGPT EDU — МЕКТЕП</span><span>Kazakhstan</span></span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">Меню</button>
+      <nav id="main-nav" class="main-nav" aria-label="Основная навигация">
+        <a href="index.html#resources"><span lang="ru">На главную</span><span lang="kk">Басты бетке</span></a>
+        <a href="statistics.html" class="nav-current" aria-current="page">Статистика</a>
+        <button class="nav-action lang-toggle" type="button" aria-label="Переключить сайт на казахский язык">Қаз</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container stats-main">
+    <header>
+      <h1 class="stats-heading">Статистика</h1>
+      <p><span lang="ru">Лицензии ChatGPT Edu по регионам Казахстана</span><span lang="kk">Қазақстан өңірлеріндегі ChatGPT Edu лицензиялары</span></p>
+      <p id="stats-date" class="stats-date"></p>
+      <a class="stats-link" href="#power-bi"><span lang="ru">Перейти к отчёту Power BI</span><span lang="kk">Power BI есебіне өту</span></a>
+    </header>
+
+    <section class="stats-section" aria-labelledby="activation-title">
+      <h2 id="activation-title"><span lang="ru">Активация по регионам</span><span lang="kk">Өңірлер бойынша белсендіру</span></h2>
+      <p><span lang="ru">Доля активированных лицензий от числа выделенных.</span><span lang="kk">Бөлінген лицензиялардың ішіндегі белсендірілген лицензиялардың үлесі.</span></p>
+      <p id="activation-note" class="stats-note" hidden><span lang="ru">Для расчёта процента нужно число выделенных лицензий по региону. Там, где оно неизвестно, указано число активаций.</span><span lang="kk">Пайызды есептеу үшін өңірге бөлінген лицензиялар саны қажет. Ол белгісіз болса, белсендірілген лицензиялар саны көрсетіледі.</span></p>
+      <ul id="activation-regions" class="stats-grid"></ul>
+    </section>
+
+    <section class="stats-section" aria-labelledby="usage-title">
+      <h2 id="usage-title"><span lang="ru">Использование по регионам</span><span lang="kk">Өңірлер бойынша пайдалану</span></h2>
+      <p><span lang="ru">Доля используемых лицензий среди активированных.</span><span lang="kk">Белсендірілген лицензиялардың ішіндегі пайдаланылып жатқан лицензиялардың үлесі.</span></p>
+      <ul id="usage-regions" class="stats-grid"></ul>
+    </section>
+
+    <section class="stats-section" id="power-bi" aria-labelledby="report-title">
+      <h2 id="report-title"><span lang="ru">Школы и детские сады в Power BI</span><span lang="kk">Power BI есебіндегі мектептер мен балабақшалар</span></h2>
+      <p><span lang="ru">Подробные данные на третьей странице отчёта.</span><span lang="kk">Толық деректер есептің үшінші бетінде берілген.</span></p>
+      <a class="stats-link" href="https://app.powerbi.com/view?r=eyJrIjoiYWIxNGIwMmMtNmQxMS00MWIwLTllMGYtNzQ3NzI0MWY1Mzk3IiwidCI6IjQ0YWY2MTM1LTFmMTYtNGU3ZS04MzViLTAwYWY1MTdkZTNmNyIsImMiOjl9&amp;pageName=b29b129cdeed528605f2" target="_blank" rel="noopener noreferrer"><span lang="ru">Открыть отчёт в новой вкладке</span><span lang="kk">Есепті жаңа қойындыда ашу</span></a>
+      <iframe class="stats-report" src="https://app.powerbi.com/view?r=eyJrIjoiYWIxNGIwMmMtNmQxMS00MWIwLTllMGYtNzQ3NzI0MWY1Mzk3IiwidCI6IjQ0YWY2MTM1LTFmMTYtNGU3ZS04MzViLTAwYWY1MTdkZTNmNyIsImMiOjl9&amp;pageName=b29b129cdeed528605f2" title="Power BI — школы и детские сады / мектептер мен балабақшалар" loading="lazy" allowfullscreen></iframe>
+    </section>
+  </main>
+
+  <script type="application/json" id="regional-statistics">
+{"asOf":"2026-11-25T12:46:42.881Z","regions":[
+{"id":"KZ10","ru":"Область Абай","kk":"Абай облысы","issued":null,"activated":2696,"used":2311},
+{"id":"KZ11","ru":"Акмолинская область","kk":"Ақмола облысы","issued":null,"activated":4941,"used":4416},
+{"id":"KZ15","ru":"Актюбинская область","kk":"Ақтөбе облысы","issued":null,"activated":4903,"used":4113},
+{"id":"KZ19","ru":"Алматинская область","kk":"Алматы облысы","issued":null,"activated":6614,"used":6504},
+{"id":"KZ23","ru":"Атырауская область","kk":"Атырау облысы","issued":null,"activated":2831,"used":2445},
+{"id":"KZ27","ru":"Западно-Казахстанская область","kk":"Батыс Қазақстан облысы","issued":null,"activated":5457,"used":5384},
+{"id":"KZ31","ru":"Жамбылская область","kk":"Жамбыл облысы","issued":null,"activated":5976,"used":5825},
+{"id":"KZ33","ru":"Область Жетісу","kk":"Жетісу облысы","issued":null,"activated":4167,"used":3675},
+{"id":"KZ35","ru":"Карагандинская область","kk":"Қарағанды облысы","issued":null,"activated":4549,"used":4081},
+{"id":"KZ39","ru":"Костанайская область","kk":"Қостанай облысы","issued":null,"activated":5577,"used":4761},
+{"id":"KZ43","ru":"Кызылординская область","kk":"Қызылорда облысы","issued":null,"activated":4954,"used":4853},
+{"id":"KZ47","ru":"Мангистауская область","kk":"Маңғыстау облысы","issued":null,"activated":2744,"used":2431},
+{"id":"KZ55","ru":"Павлодарская область","kk":"Павлодар облысы","issued":null,"activated":2764,"used":2383},
+{"id":"KZ59","ru":"Северо-Казахстанская область","kk":"Солтүстік Қазақстан облысы","issued":null,"activated":2598,"used":2216},
+{"id":"KZ61","ru":"Туркестанская область","kk":"Түркістан облысы","issued":null,"activated":13567,"used":13038},
+{"id":"KZ62","ru":"Область Ұлытау","kk":"Ұлытау облысы","issued":null,"activated":1195,"used":983},
+{"id":"KZ63","ru":"Восточно-Казахстанская область","kk":"Шығыс Қазақстан облысы","issued":null,"activated":1873,"used":1664},
+{"id":"KZ71","ru":"г. Астана","kk":"Астана қаласы","issued":null,"activated":5261,"used":4635},
+{"id":"KZ75","ru":"г. Алматы","kk":"Алматы қаласы","issued":null,"activated":4848,"used":4422},
+{"id":"KZ79","ru":"г. Шымкент","kk":"Шымкент қаласы","issued":null,"activated":3107,"used":3056}
+]}
+  </script>
+  <script>
+    (() => {
+      const stats = JSON.parse(document.getElementById('regional-statistics').textContent);
+      const labels = {
+        ru: {date:'Снимок Power BI от', unknown:'Доля неизвестна', activated:'активировано', used:'используется', of:' из '},
+        kk: {date:'Power BI деректерінің күні', unknown:'Үлесі белгісіз', activated:'белсендірілді', used:'пайдаланылып жатыр', of:' / '}
+      };
+      const validCount = value => Number.isSafeInteger(value) && value >= 0;
+      function ratio(numerator, denominator) {
+        if (!validCount(numerator) || !validCount(denominator) || denominator === 0 || numerator > denominator) return null;
+        return numerator / denominator;
+      }
+
+      function render() {
+        const language = document.documentElement.lang === 'kk' ? 'kk' : 'ru';
+        const locale = language === 'kk' ? 'kk-KZ' : 'ru-RU';
+        const copy = labels[language];
+        const number = new Intl.NumberFormat(locale);
+        const percent = new Intl.NumberFormat(locale, {style:'percent', maximumFractionDigits:1});
+        const date = new Intl.DateTimeFormat(locale, {dateStyle:'medium', timeZone:'Asia/Qyzylorda'});
+        document.title = 'Статистика — Bilim AI';
+        document.getElementById('stats-date').textContent = copy.date + ' ' + date.format(new Date(stats.asOf));
+
+        function tile(row, numerator, denominator, caption) {
+          const share = ratio(numerator, denominator);
+          const item = document.createElement('li');
+          item.className = 'stats-region';
+          const name = document.createElement('strong');
+          name.textContent = row[language];
+          const value = document.createElement('span');
+          value.className = 'stats-value';
+          value.textContent = share === null ? '—' : percent.format(share);
+          if (share === null) value.setAttribute('aria-label', copy.unknown);
+          const count = document.createElement('span');
+          count.className = 'stats-count';
+          count.textContent = validCount(numerator) ? number.format(numerator) + (validCount(denominator) ? copy.of + number.format(denominator) : '') + ' · ' + caption : '—';
+          item.append(name, value, count);
+          if (share !== null) {
+            const meter = document.createElement('meter');
+            meter.max = 1;
+            meter.value = share;
+            meter.setAttribute('aria-hidden', 'true');
+            item.append(meter);
+          }
+          return item;
+        }
+
+        const regions = stats.regions.slice().sort((a, b) => a[language].localeCompare(b[language], locale));
+        document.getElementById('activation-regions').replaceChildren(...regions.map(row => tile(row, row.activated, row.issued, copy.activated)));
+        document.getElementById('usage-regions').replaceChildren(...regions.map(row => tile(row, row.used, row.activated, copy.used)));
+        document.getElementById('activation-note').hidden = regions.every(row => ratio(row.activated, row.issued) !== null);
+      }
+
+      new MutationObserver(render).observe(document.documentElement, {attributeFilter:['lang']});
+      render();
+    })();
+  </script>
+</body>
+</html>
