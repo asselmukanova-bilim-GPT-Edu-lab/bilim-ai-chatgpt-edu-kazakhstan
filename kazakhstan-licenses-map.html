@@ -41,9 +41,22 @@ svg{display:block;width:100%;height:auto;max-height:54rem}
 .label{fill:#fff;font:600 7px/1 Inter,"Segoe UI",sans-serif;text-anchor:middle;paint-order:stroke;stroke:#202892a8;stroke-width:1.65;stroke-linejoin:round}
 .label.cityLabel{font-size:6.4px;text-anchor:start}
 .city{cursor:pointer;outline:none}.city .hit{fill:transparent}.cityDot{fill:#fff;stroke:#3027ec;stroke-width:1.35;vector-effect:non-scaling-stroke}.city.active .cityDot,.city:focus-visible .cityDot{fill:#8afaff;stroke:#1d168f;stroke-width:2.1}
-.details{position:absolute;top:14px;left:21px;max-width:calc(100% - 42px);pointer-events:none;color:#151b64;text-shadow:0 1px 5px #fff,0 1px 9px #fff}
-.details strong{display:block;font-size:14px;font-weight:750}
-.details p{margin:1px 0;font-size:12px}.details b{font-variant-numeric:tabular-nums}
+.details{
+  position:absolute;inset:clamp(12px,1.6vw,24px) auto auto clamp(12px,1.6vw,24px);
+  z-index:1;width:min(21rem,calc(100% - 48px));padding:14px 16px;
+  border:1px solid #fff;border-radius:4px 4px 8px 4px;
+  background:linear-gradient(150deg,#fff 30%,#f5f6fb);
+  box-shadow:2px 7px 15px #18236026,7px 12px 23px -16px #18236080;
+  pointer-events:none;
+}
+.details strong{display:block;margin-bottom:8px;font-size:1rem;font-weight:750;line-height:1.25}
+.details dl{margin:0;font-size:.8125rem}
+.details dt{font-weight:750}
+.details dd{margin:0;color:var(--muted)}
+.details dd span{display:inline-block}
+.details b{color:var(--ink);font-variant-numeric:tabular-nums}
+.details dl div+div{margin-top:6px;padding-top:6px;border-top:1px solid #dfe4f2}
+.details small{display:block;margin-top:7px;color:var(--muted);font-size:.6875rem}
 .bottom{padding:9px clamp(14px,3vw,36px) 14px;color:var(--muted);font-size:12px}
 .legend{display:inline-flex;align-items:center;gap:7px}
 .swatch{width:72px;height:5px;border-radius:10px;background:linear-gradient(90deg,#36cdec,#297af5,#3027ec)}
@@ -63,11 +76,8 @@ a{color:#3531a0;text-underline-offset:2px}
   }
   .areaLabel,.cityLabel{display:none}
   .details{
-    position:static;max-width:none;margin:0 1rem 1rem;padding:.75rem;
-    border:1px solid #d8dffa;border-radius:.75rem;background:#fff;text-shadow:none;
+    position:static;width:auto;margin:0 1rem 1rem;
   }
-  .details p{font-size:.875rem}
-  .details p span{display:inline-block}
 }
 @media(prefers-reduced-motion:reduce){.face{transition:none}}
 </style>
@@ -100,8 +110,17 @@ a{color:#3531a0;text-underline-offset:2px}
     </div>
     <div class="details" id="details" hidden>
       <strong id="place"></strong>
-      <p id="metrics"><span>Белсендірілді <b id="activated"></b></span> · <span>Пайдаланылып жатыр <b id="used"></b></span></p>
-      <p id="empty" hidden>Power BI деректері қолжетімсіз</p>
+      <dl>
+        <div>
+          <dt>Мектептер</dt>
+          <dd><span>Белсендірілді <b id="school-activated">—</b></span> · <span>Пайдаланылып жатыр <b id="school-used">—</b></span></dd>
+        </div>
+        <div>
+          <dt>Балабақшалар</dt>
+          <dd><span>Белсендірілді <b id="kindergarten-activated">—</b></span> · <span>Пайдаланылып жатыр <b id="kindergarten-used">—</b></span></dd>
+        </div>
+      </dl>
+      <small id="breakdown-status"></small>
     </div>
     <div id="announcement" aria-live="polite" class="sr-only"></div>
   </section>
@@ -112,7 +131,7 @@ a{color:#3531a0;text-underline-offset:2px}
   </div>
 </main>
 <script type="module">
-import { subscribeRegionalLicenses } from './regional-licenses.js?v=20261127-1';
+import { subscribeRegionalLicenses, subscribeRegionalLicenseBreakdown } from './regional-licenses.js?v=20261127-2';
 
 const regions = [
   ["KZ10","Абай облысы","Абай облысы","M 487.6 186.2 L 482.2 180.2 L 475.6 181.6 L 474.7 179.8 L 467.3 176.3 L 465.3 179.6 L 463.2 177.7 L 461.3 180.4 L 453.7 180.8 L 452.3 183.4 L 446.3 180.1 L 447.5 176.4 L 450.4 176.5 L 448.3 171.2 L 451.1 164.1 L 450.2 163.0 L 452.7 161.7 L 448.1 159.7 L 449.8 157.6 L 446.9 157.7 L 444.7 155.4 L 450.5 150.2 L 450.7 146.9 L 450.0 145.2 L 444.2 146.7 L 443.0 142.5 L 445.7 141.5 L 438.0 134.6 L 438.1 133.3 L 444.9 129.7 L 446.2 126.5 L 445.7 121.9 L 449.4 120.2 L 452.4 115.3 L 460.5 117.8 L 464.6 117.0 L 467.2 111.2 L 465.2 108.2 L 465.0 103.4 L 462.2 104.1 L 461.8 101.8 L 458.1 99.7 L 455.5 95.4 L 464.2 90.0 L 463.0 87.1 L 466.0 86.7 L 466.8 83.6 L 470.4 80.6 L 483.2 99.5 L 482.8 97.5 L 484.5 97.6 L 484.3 96.0 L 487.8 94.0 L 486.6 89.1 L 489.0 88.7 L 489.4 86.4 L 495.2 88.4 L 496.0 87.5 L 496.1 93.3 L 500.4 91.8 L 501.8 96.4 L 504.1 96.2 L 506.8 100.9 L 507.3 107.1 L 502.2 105.8 L 502.8 107.8 L 500.2 107.9 L 499.6 109.9 L 503.1 110.3 L 503.3 113.6 L 508.4 114.9 L 509.2 118.9 L 513.3 121.0 L 515.4 124.1 L 519.8 125.9 L 520.8 124.7 L 523.2 127.2 L 524.9 126.5 L 525.8 130.6 L 529.3 132.0 L 528.3 135.8 L 529.7 135.8 L 529.3 134.4 L 530.4 136.3 L 533.4 135.0 L 531.7 138.1 L 533.3 138.1 L 533.6 136.7 L 541.5 141.9 L 534.0 153.1 L 534.7 156.5 L 539.5 162.4 L 539.7 167.3 L 537.7 168.7 L 532.9 206.6 L 531.0 206.5 L 529.8 202.3 L 525.0 195.7 L 518.8 191.3 L 519.2 189.1 L 518.4 190.1 L 512.3 188.0 L 507.6 188.5 L 494.3 182.8 L 487.6 186.2 Z",490.7,144.8,"Область Абай"],
@@ -142,6 +161,8 @@ const faces = document.querySelector('#faces');
 const markers = document.querySelector('#cities');
 const labels = document.querySelector('#labels');
 const details = document.querySelector('#details');
+const selectedPlace = document.querySelector('#place');
+const breakdownStatus = document.querySelector('#breakdown-status');
 const formatter = new Intl.NumberFormat('kk-KZ');
 const cityIds = new Set(['KZ71', 'KZ75', 'KZ79']);
 const areas = new Map();
@@ -153,8 +174,8 @@ const palette = [
   ['#459efa','#334ef3','#402bdc'],
   ['#598bff','#3c37ee','#3022cf']
 ];
-let hovered, focused, pinned, current;
-let readings = {};
+let hovered, focused, selected, current;
+let breakdown = {};
 
 function svgNode(tag, attributes, parent) {
   const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -179,23 +200,41 @@ function bind(node, id) {
   node.setAttribute('role', 'button');
   node.setAttribute('tabindex', '0');
   node.addEventListener('pointerenter', event => {
-    if (event.pointerType === 'mouse') { hovered = id; render(); }
+    if (event.pointerType !== 'mouse') return;
+    hovered = id;
+    focused = selected = null;
+    regionPicker.value = '';
+    render();
   });
   node.addEventListener('pointerleave', () => {
     if (hovered === id) { hovered = null; render(); }
   });
-  node.addEventListener('focus', () => { focused = id; render(); });
+  node.addEventListener('focus', () => {
+    if (!node.matches(':focus-visible')) return;
+    focused = id;
+    render();
+  });
   node.addEventListener('blur', () => { focused = null; render(); });
-  node.addEventListener('click', () => pick(id));
+  node.addEventListener('click', event => {
+    if (event.pointerType === 'touch' || event.pointerType === 'pen' || event.detail === 0) {
+      pick(selected === id ? null : id);
+    }
+  });
   node.addEventListener('keydown', event => {
-    if (event.key === ' ' || event.key === 'Enter') { event.preventDefault(); pick(id); }
+    if (event.key === ' ' || event.key === 'Enter') {
+      event.preventDefault();
+      hovered = selected = null;
+      regionPicker.value = '';
+      focused = id;
+      render(true);
+    }
   });
 }
 
 function pick(id) {
   hovered = focused = null;
-  pinned = pinned === id ? null : id;
-  regionPicker.value = pinned || '';
+  selected = id;
+  regionPicker.value = id || '';
   render(true);
 }
 
@@ -223,48 +262,49 @@ const isCount = value => Number.isSafeInteger(value) && value >= 0;
 const formatCount = value => isCount(value)
   ? formatter.formatToParts(value).map(part => part.type === 'group' ? '\u202f' : part.value).join('')
   : '—';
+const categories = [
+  { key: 'school', label: 'Мектептер' },
+  { key: 'kindergarten', label: 'Балабақшалар' }
+].map(category => ({
+  ...category,
+  activated: document.getElementById(category.key + '-activated'),
+  used: document.getElementById(category.key + '-used')
+}));
+
 function render(announce = false) {
-  const id = hovered || focused || pinned;
+  const id = hovered || focused || selected;
   if (current) areas.get(current).node.classList.remove('active');
   current = id;
   details.hidden = !id;
   if (!id) return;
   const area = areas.get(id);
-  const record = readings[id] || {};
-  const hasMetrics = isCount(record.activated) || isCount(record.used);
+  const record = breakdown[id] || {};
   area.node.classList.add('active');
-  document.querySelector('#place').textContent = area.name;
-  document.querySelector('#metrics').hidden = !hasMetrics;
-  document.querySelector('#empty').hidden = hasMetrics;
-  document.querySelector('#activated').textContent = formatCount(record.activated);
-  document.querySelector('#used').textContent = formatCount(record.used);
+  selectedPlace.textContent = area.name;
+  for (const category of categories) {
+    category.activated.textContent = formatCount(record[category.key]?.activated);
+    category.used.textContent = formatCount(record[category.key]?.used);
+  }
   if (announce) document.querySelector('#announcement').textContent = area.node.getAttribute('aria-label');
 }
 
-function applyReadings(next) {
-  readings = next;
-  const activations = Object.values(readings).map(record => record.activated).filter(isCount);
+function applyReadings(counts) {
+  const activations = Object.values(counts).map(record => record.activated).filter(isCount);
   const maximum = Math.max(1, ...activations);
   document.querySelector('#legend').hidden = activations.length === 0;
-  for (const [id, {node, name, city}] of areas) {
-    const {activated, used} = readings[id] || {};
+  for (const [id, {node, city}] of areas) {
+    const {activated} = counts[id] || {};
     if (!city) {
       const shade = isCount(activated) ? Math.min(4, Math.floor(5 * activated / maximum)) : 1;
       node.setAttribute('fill', 'url(#glass-'+shade+')');
     }
-    node.setAttribute('aria-label', name + '. Белсендірілді ' + formatCount(activated) + '. Пайдаланылып жатыр ' + formatCount(used));
   }
-  render();
 }
 
-regionPicker.addEventListener('change', () => {
-  hovered = focused = null;
-  pinned = regionPicker.value || null;
-  render(true);
-});
+regionPicker.addEventListener('change', () => pick(regionPicker.value || null));
 document.addEventListener('keydown', event => {
   if (event.key !== 'Escape') return;
-  hovered = focused = pinned = null;
+  hovered = focused = selected = null;
   regionPicker.value = '';
   render();
 });
@@ -273,9 +313,9 @@ const dateFormat = new Intl.DateTimeFormat('kk-KZ', {
 });
 const status = document.querySelector('#freshness');
 
-function showDate(label, checkedAt) {
+function showDate(element, label, checkedAt) {
   const parts = Object.fromEntries(dateFormat.formatToParts(new Date(checkedAt)).map(part => [part.type, part.value]));
-  status.textContent = label + ' · ' + [parts.day, parts.month, parts.year].join('.') + ', ' + parts.hour + ':' + parts.minute;
+  element.textContent = label + ' · ' + [parts.day, parts.month, parts.year].join('.') + ', ' + parts.hour + ':' + parts.minute;
 }
 
 const freshnessLabels = {
@@ -285,7 +325,24 @@ const freshnessLabels = {
 };
 subscribeRegionalLicenses(({ counts, checkedAt, state }) => {
   applyReadings(counts);
-  showDate(freshnessLabels[state], checkedAt);
+  showDate(status, freshnessLabels[state], checkedAt);
+});
+
+subscribeRegionalLicenseBreakdown(({ counts, checkedAt, state }) => {
+  breakdown = counts;
+  if (checkedAt) {
+    showDate(breakdownStatus, state === 'live' ? 'Power BI' : 'Соңғы алынған деректер', checkedAt);
+  } else {
+    breakdownStatus.textContent = 'Power BI деректері қолжетімсіз';
+  }
+  for (const [id, {node, name}] of areas) {
+    const summary = categories.map(({key, label}) => {
+      const record = counts[id]?.[key];
+      return `${label}. Белсендірілді ${formatCount(record?.activated)}. Пайдаланылып жатыр ${formatCount(record?.used)}.`;
+    });
+    node.setAttribute('aria-label', [name + '.', ...summary].join(' '));
+  }
+  render();
 });
 </script>
 </body>

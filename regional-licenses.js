@@ -46,6 +46,30 @@ const snapshot = {
 };
 const snapshotDate = '2026-11-27T04:51:37.346Z';
 
+const breakdownSnapshot = {
+  KZ11: { school: { activated: 4459, used: 3993 }, kindergarten: { activated: 166, used: 129 } },
+  KZ15: { school: { activated: 4186, used: 3494 }, kindergarten: { activated: 193, used: 144 } },
+  KZ19: { school: { activated: 5909, used: 5844 }, kindergarten: { activated: 170, used: 129 } },
+  KZ23: { school: { activated: 2384, used: 2019 }, kindergarten: { activated: 74, used: 56 } },
+  KZ63: { school: { activated: 1330, used: 1156 }, kindergarten: { activated: 132, used: 104 } },
+  KZ75: { school: { activated: 3689, used: 3295 }, kindergarten: { activated: 113, used: 89 } },
+  KZ71: { school: { activated: 4139, used: 3593 }, kindergarten: { activated: 391, used: 312 } },
+  KZ79: { school: { activated: 2552, used: 2523 }, kindergarten: { activated: 64, used: 37 } },
+  KZ31: { school: { activated: 4926, used: 4918 }, kindergarten: { activated: 458, used: 319 } },
+  KZ27: { school: { activated: 4818, used: 4782 }, kindergarten: { activated: 233, used: 200 } },
+  KZ35: { school: { activated: 3558, used: 3104 }, kindergarten: { activated: 304, used: 273 } },
+  KZ39: { school: { activated: 4883, used: 4101 }, kindergarten: { activated: 260, used: 229 } },
+  KZ43: { school: { activated: 4277, used: 4256 }, kindergarten: { activated: 256, used: 173 } },
+  KZ47: { school: { activated: 2342, used: 2059 }, kindergarten: { activated: 49, used: 33 } },
+  KZ10: { school: { activated: 2272, used: 1922 }, kindergarten: { activated: 115, used: 88 } },
+  KZ33: { school: { activated: 3707, used: 3243 }, kindergarten: { activated: 161, used: 140 } },
+  KZ62: { school: { activated: 1004, used: 794 }, kindergarten: { activated: 21, used: 20 } },
+  KZ55: { school: { activated: 1959, used: 1657 }, kindergarten: { activated: 280, used: 208 } },
+  KZ59: { school: { activated: 2314, used: 1971 }, kindergarten: { activated: 135, used: 96 } },
+  KZ61: { school: { activated: 12582, used: 12251 }, kindergarten: { activated: 519, used: 326 } }
+};
+const breakdownSnapshotDate = '2026-11-27T06:42:16.211Z';
+
 const reportEndpoint = 'https://wabi-west-europe-api.analysis.windows.net/public/reports/querydata?synchronous=true';
 const reportKey = 'ab14b02c-6d11-41b0-9e0f-7477241f5397';
 const reportQuery = {
@@ -314,9 +338,23 @@ const reportQuery = {
 };
 
 const regionIds = new Map(regionalNames.map(({source, id}) => [source, id]));
+const levels = new Map([['СО', 'school'], ['ДО', 'kindergarten']]);
 const isCount = value => Number.isSafeInteger(value) && value >= 0;
 
-function decodeReadings(response) {
+function createBreakdownQuery() {
+  const query = structuredClone(reportQuery);
+  const command = query.queries[0].Query.Commands[0].SemanticQueryDataShapeCommand;
+  command.Query.Select.splice(1, 0, {
+    Column: { Expression: { SourceRef: { Source: 'v' } }, Property: 'Весь список.Уровень' },
+    Name: 'Уровень'
+  });
+  command.Binding.Primary.Groupings[0].Projections = [0, 1, 2, 3];
+  command.Binding.DataReduction.Primary.Top.Count = 200;
+  query.queries[0].QueryId = 'regional-license-breakdown';
+  return query;
+}
+
+function decodeReadings(response, withBreakdown) {
   const result = response.results?.[0]?.result?.data;
   const series = result?.dsr?.DS?.[0];
   const rows = series?.PH?.[0]?.DM0;
@@ -324,10 +362,11 @@ function decodeReadings(response) {
     throw new Error('Power BI did not return regional data');
   }
   const counts = Object.create(null);
+  const expectedSchema = withBreakdown ? 'G0,G1,M0,M1' : 'G0,M0,M1';
   let schema, previous = [];
   for (const row of rows) {
     schema = row.S || schema;
-    if (!schema || schema.length !== 3 || schema.map(column => column.N).join(',') !== 'G0,M0,M1') {
+    if (!schema || schema.map(column => column.N).join(',') !== expectedSchema) {
       throw new Error('Unexpected regional data schema');
     }
     let position = 0;
@@ -339,19 +378,29 @@ function decodeReadings(response) {
       return column.DN && value != null ? series.ValueDicts?.[column.DN]?.[value] : value;
     });
     previous = values;
-    const [name, activated, used] = values;
+    const name = values[0];
+    const [activated, used] = values.slice(-2);
     const id = regionIds.get(typeof name === 'string' ? name.replace(/^г\.\s*/iu, '').trim() : '');
-    if (!id || counts[id] || ![activated, used].every(value => value === null || isCount(value))) {
+    if (!id || ![activated, used].every(value => value === null || isCount(value))) {
       throw new Error('Unexpected regional row');
     }
-    counts[id] = {activated, used};
+    if (withBreakdown) {
+      const category = levels.get(values[1]);
+      if (!category) continue;
+      const region = counts[id] ??= {};
+      if (region[category]) throw new Error('Duplicate regional category');
+      region[category] = {activated, used};
+    } else {
+      if (counts[id]) throw new Error('Duplicate region');
+      counts[id] = {activated, used};
+    }
   }
   if (Object.keys(counts).length !== regionIds.size) throw new Error('Regional data is incomplete');
   return {counts, checkedAt:result.timestamp};
 }
 
-export function subscribeRegionalLicenses(receive) {
-  let current = { counts: snapshot, checkedAt: snapshotDate, state: 'snapshot' };
+function subscribeReadings(receive, query, initial, withBreakdown = false) {
+  let current = { ...initial, state: 'snapshot' };
   let pending = false;
   const interval = 10 * 60 * 1000;
   let nextCheck = 0;
@@ -371,11 +420,11 @@ export function subscribeRegionalLicenses(receive) {
           ActivityId: crypto.randomUUID(),
           RequestId: crypto.randomUUID()
         },
-        body: JSON.stringify(reportQuery),
+        body: JSON.stringify(query),
         signal: AbortSignal.timeout(18000)
       });
       if (!response.ok) throw new Error('Power BI HTTP ' + response.status);
-      const reading = decodeReadings(await response.json());
+      const reading = decodeReadings(await response.json(), withBreakdown);
       if (Date.parse(reading.checkedAt) < Date.parse(current.checkedAt)) {
         throw new Error('Outdated Power BI response');
       }
@@ -394,4 +443,12 @@ export function subscribeRegionalLicenses(receive) {
   refresh();
   setInterval(refresh, 30_000);
   document.addEventListener('visibilitychange', refresh);
+}
+
+export function subscribeRegionalLicenses(receive) {
+  subscribeReadings(receive, reportQuery, { counts: snapshot, checkedAt: snapshotDate });
+}
+
+export function subscribeRegionalLicenseBreakdown(receive) {
+  subscribeReadings(receive, createBreakdownQuery(), { counts: breakdownSnapshot, checkedAt: breakdownSnapshotDate }, true);
 }
