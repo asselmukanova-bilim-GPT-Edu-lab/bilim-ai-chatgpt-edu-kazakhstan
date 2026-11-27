@@ -1,10 +1,31 @@
-// Each deck contains translated title text and an ordered list of slide image URLs.
-// Example item: { title: { ru: 'Название', kk: 'Атауы' }, slides: [{ src: 'assets/presentations/slide-01.webp', alt: { ru: 'Описание', kk: 'Сипаттама' } }] }
-export const presentations = [];
+const seminarSite = 'https://asselmukanova-bilim-gpt-edu-lab.github.io';
+const slidesPerFile = 8;
+
+export const presentations = [
+  {
+    id: 'school',
+    title: { ru: 'Семинар для школьных педагогов', kk: 'Мектеп педагогтеріне арналған семинар' },
+    source: `${seminarSite}/chatgpt-edu-seminar/teachers/`,
+    count: 30
+  },
+  {
+    id: 'regions',
+    title: { ru: 'ChatGPT Edu для регионов', kk: 'Өңірлерге арналған ChatGPT Edu' },
+    source: `${seminarSite}/chatgpt-edu-webinar/`,
+    count: 34
+  },
+  {
+    id: 'humanities',
+    title: { ru: 'Семинар для учителей гуманитарных направлений', kk: 'Гуманитарлық пән мұғалімдеріне арналған семинар' },
+    source: `${seminarSite}/chatgpt-edu-kazakh-lanq-seminar/`,
+    originalLanguage: 'kk',
+    count: 16
+  }
+];
 
 const copy = {
-  ru: { section: 'Методическая поддержка', previous: 'Предыдущий слайд', next: 'Следующий слайд', slide: 'Слайд', of: 'из', missing: 'Слайд временно недоступен' },
-  kk: { section: 'Әдістемелік қолдау', previous: 'Алдыңғы слайд', next: 'Келесі слайд', slide: 'Слайд', of: '/', missing: 'Слайд уақытша қолжетімсіз' }
+  ru: { section: 'Методическая поддержка', previous: 'Предыдущий слайд', next: 'Следующий слайд', slide: 'Слайд', of: 'из', open: 'Открыть для демонстрации', loading: 'Загружаем слайд…', missing: 'Слайд временно недоступен' },
+  kk: { section: 'Әдістемелік қолдау', previous: 'Алдыңғы слайд', next: 'Келесі слайд', slide: 'Слайд', of: '/', open: 'Көрсету үшін ашу', loading: 'Слайд жүктелуде…', missing: 'Слайд уақытша қолжетімсіз' }
 };
 
 const language = () => document.documentElement.lang === 'kk' ? 'kk' : 'ru';
@@ -13,14 +34,26 @@ function localText(info, lang) {
   return info?.[lang] || info?.ru || info?.kk || '';
 }
 
-function imageUrl(value) {
-  try {
-    if (typeof value !== 'string' || !value.trim()) return null;
-    const url = new URL(value, document.baseURI);
-    return url.protocol === 'https:' || (url.protocol === 'http:' && url.origin === location.origin) ? url.href : null;
-  } catch {
-    return null;
+const previewFiles = new Map();
+
+async function previewSlide(deck, index, lang) {
+  const prefix = `assets/presentations/${deck.id}-${lang}`;
+  if (index === 0) return { src: `${prefix}-cover.webp` };
+  const path = `${prefix}-${Math.floor(index / slidesPerFile) + 1}.json`;
+  if (!previewFiles.has(path)) {
+    const request = fetch(path).then(response => {
+      if (!response.ok) throw new Error(`Presentation preview returned ${response.status}`);
+      return response.json();
+    }).catch(error => {
+      previewFiles.delete(path);
+      throw error;
+    });
+    previewFiles.set(path, request);
   }
+  const slides = await previewFiles.get(path);
+  const { image, alt, hash } = slides[index % slidesPerFile];
+  if (!image) throw new Error('Presentation slide image is missing');
+  return { src: `data:image/webp;base64,${image}`, alt, hash };
 }
 
 function create(tag, className, text) {
@@ -33,16 +66,19 @@ function create(tag, className, text) {
 function buildCard(deck, deckIndex) {
   let index = 0;
   let pointer = null;
+  let loadedLanguage;
+  let activeRequest = 0;
+  let shownSlide;
+  let stageState = 'loading';
   const card = create('article', 'presentation-card video-card');
   const stage = create('div', 'presentation-stage');
   const image = create('img');
   image.loading = 'lazy';
   image.decoding = 'async';
   image.draggable = false;
-  const error = create('div', 'presentation-image-error');
-  error.hidden = true;
-  error.setAttribute('role', 'status');
-  stage.append(image, error);
+  const status = create('div', 'presentation-image-status');
+  status.setAttribute('role', 'status');
+  stage.append(image, status);
 
   const controls = create('div', 'presentation-controls');
   const previous = create('button', null, '←');
@@ -57,46 +93,70 @@ function buildCard(deck, deckIndex) {
   const titleId = 'presentation-title-' + (deckIndex + 1);
   heading.id = titleId;
   card.setAttribute('aria-labelledby', titleId);
-  const description = create('p');
-  information.append(heading, description);
+  const open = create('a', 'presentation-open');
+  open.target = '_blank';
+  open.rel = 'noopener noreferrer';
+  information.append(heading, open);
   card.append(stage, controls, information);
   stage.tabIndex = 0;
   stage.setAttribute('role', 'group');
 
-  function updateLanguage() {
+  function updateLabels() {
     const lang = language();
     const labels = copy[lang];
-    const slideLabel = labels.slide + ' ' + (index + 1) + ' ' + labels.of + ' ' + deck.slides.length;
+    const slideLabel = labels.slide + ' ' + (index + 1) + ' ' + labels.of + ' ' + deck.count;
     heading.textContent = localText(deck.title, lang);
-    description.textContent = localText(deck.description, lang);
-    description.hidden = !description.textContent;
     stage.setAttribute('aria-label', heading.textContent + '. ' + slideLabel);
-    image.alt = localText(deck.slides[index].alt, lang) || heading.textContent + '. ' + slideLabel;
+    image.alt = shownSlide?.alt || heading.textContent + '. ' + slideLabel;
+    image.lang = deck.originalLanguage || lang;
     previous.setAttribute('aria-label', labels.previous);
     next.setAttribute('aria-label', labels.next);
     counter.textContent = slideLabel;
-    error.textContent = labels.missing;
+    status.textContent = stageState === 'loading' ? labels.loading : labels.missing;
+    status.hidden = stageState === 'ready';
+    image.hidden = stageState !== 'ready';
+    open.textContent = labels.open;
+    const destination = new URL(deck.source);
+    if (shownSlide?.hash) destination.hash = shownSlide.hash;
+    open.href = destination.href;
   }
 
-  function showSlide(newIndex) {
+  async function showSlide(newIndex) {
     index = newIndex;
-    error.hidden = true;
-    image.hidden = false;
-    updateLanguage();
-    image.src = deck.slides[index].src;
+    loadedLanguage = deck.originalLanguage || language();
+    const request = ++activeRequest;
+    shownSlide = null;
+    stageState = 'loading';
+    updateLabels();
     previous.setAttribute('aria-disabled', String(index === 0));
-    next.setAttribute('aria-disabled', String(index === deck.slides.length - 1));
+    next.setAttribute('aria-disabled', String(index === deck.count - 1));
+    try {
+      const slide = await previewSlide(deck, index, loadedLanguage);
+      if (request !== activeRequest) return;
+      const decoded = new Image();
+      decoded.src = slide.src;
+      await decoded.decode();
+      if (request !== activeRequest) return;
+      shownSlide = slide;
+      image.src = slide.src;
+      stageState = 'ready';
+    } catch {
+      if (request !== activeRequest) return;
+      stageState = 'missing';
+    }
+    updateLabels();
+  }
+
+  function updateLanguage() {
+    if ((deck.originalLanguage || language()) !== loadedLanguage) showSlide(index);
+    else updateLabels();
   }
 
   function move(direction) {
     const nextIndex = index + direction;
-    if (nextIndex >= 0 && nextIndex < deck.slides.length) showSlide(nextIndex);
+    if (nextIndex >= 0 && nextIndex < deck.count) showSlide(nextIndex);
   }
 
-  image.addEventListener('error', () => {
-    image.hidden = true;
-    error.hidden = false;
-  });
   previous.addEventListener('click', () => move(-1));
   next.addEventListener('click', () => move(1));
   card.addEventListener('keydown', event => {
@@ -125,13 +185,7 @@ function buildCard(deck, deckIndex) {
 export function renderPresentations(decks) {
   const shelf = document.getElementById('presentation-shelf');
   const empty = document.getElementById('presentation-empty');
-  const records = decks.filter(deck => deck?.title && Array.isArray(deck.slides) && deck.slides.length)
-    .map(deck => ({
-      ...deck,
-      slides: deck.slides.map(slide => ({ ...slide, src: imageUrl(slide?.src) })).filter(slide => slide.src)
-    }))
-    .filter(deck => deck.slides.length);
-  const cards = records.map(buildCard);
+  const cards = decks.map(buildCard);
   shelf.replaceChildren(...cards.map(item => item.card));
   shelf.hidden = cards.length === 0;
   empty.hidden = cards.length > 0;

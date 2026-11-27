@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Методическая поддержка — Bilim AI</title>
-  <meta name="description" content="Презентации Bilim AI для администрации организаций образования.">
+  <meta name="description" content="Презентации семинаров Bilim AI для педагогов. Листайте слайды и открывайте презентации для демонстрации.">
   <link rel="icon" type="image/png" href="assets/bilim-ai-logo-symbol.png">
   <link rel="stylesheet" href="styles.css?v=20261119-10">
   <link rel="stylesheet" href="responsive.css?v=20261126">
@@ -54,7 +54,7 @@
       height: 100%;
       object-fit: contain;
     }
-    .presentation-stage .presentation-image-error {
+    .presentation-stage .presentation-image-status {
       position: absolute;
       inset: 0;
       display: grid;
@@ -92,7 +92,20 @@
     .presentation-controls output { font-size: .875rem; color: var(--muted); text-align: center; }
     .presentation-card .video-card-copy { padding: clamp(.9rem, 2vw, 1.4rem); }
     .presentation-card h3 { margin: 0; font-size: clamp(1rem, 2vw, 1.25rem); overflow-wrap: anywhere; }
-    .presentation-card p { margin: .45rem 0 0; color: var(--muted); overflow-wrap: anywhere; }
+    .presentation-open {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      margin-block-start: .8rem;
+      padding: .55rem .9rem;
+      border: 1px solid var(--line);
+      border-radius: .7rem;
+      color: #4d27cc;
+      background: #f5f2ff;
+      font-size: .875rem;
+      font-weight: 750;
+    }
+    .presentation-open:hover { background: #eee7ff; }
     .presentation-card :focus-visible { outline: 3px solid #6f45ff; outline-offset: 2px; }
     .presentation-stage:focus-visible { outline-offset: -4px; }
     .admin-support-page [hidden] { display: none !important; }
@@ -124,6 +137,6 @@
     </section>
   </main>
   <script src="script.js?v=20261119-3"></script>
-  <script type="module" src="presentation-gallery.js?v=20261127-1"></script>
+  <script type="module" src="presentation-gallery.js?v=20261127-2"></script>
 </body>
 </html>
