@@ -19,21 +19,35 @@
       min-height: calc(100svh - 82px);
       background: radial-gradient(ellipse at 93% 0%, #ece6ff, transparent 43%), #fff;
     }
-    .project-overview-inner { padding-block: clamp(40px, 6vw, 80px); }
+    .project-overview-inner {
+      padding-block: clamp(.75rem, 1.2vw, 1.25rem) clamp(40px, 6vw, 80px);
+    }
     .project-organizations {
       display: flex;
-      flex-wrap: wrap;
       justify-content: flex-end;
-      gap: .6rem 1.4rem;
       margin: 0 0 1.5rem;
       padding: 0;
       list-style: none;
       font-size: .95rem;
       font-weight: 800;
     }
-    .project-organizations li + li {
-      border-inline-start: 1px solid var(--line);
-      padding-inline-start: 1.4rem;
+    .project-organizations li {
+      display: grid;
+      grid-template-rows: clamp(2.5rem, 4vw, 3.5rem) auto;
+      justify-items: center;
+      align-items: start;
+      gap: .45rem;
+      min-width: 0;
+      padding-inline: .85rem;
+      text-align: center;
+    }
+    .project-organizations li + li { border-inline-start: 1px solid var(--line); }
+    .project-organizations li:last-child { padding-inline-end: 0; }
+    .project-organizations img {
+      display: block;
+      width: min(100%, 8.25rem);
+      height: 100%;
+      object-fit: contain;
     }
     .project-overview h1 {
       margin: 0;
@@ -119,11 +133,15 @@
     }
     @media (max-width: 860px) {
       .project-figures { grid-template-columns: minmax(0, 1fr); }
-      .project-organizations { justify-content: flex-start; }
+      .project-organizations {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        max-width: 31rem;
+      }
     }
     @media (max-width: 460px) {
-      .project-organizations { column-gap: .65rem; }
-      .project-organizations li + li { padding-inline-start: .65rem; }
+      .project-organizations { font-size: .75rem; line-height: 1.3; }
+      .project-organizations li { padding-inline: .45rem; }
     }
   </style>
 </head>
@@ -147,9 +165,18 @@
   <main class="project-overview">
     <div class="container project-overview-inner">
       <ul class="project-organizations">
-        <li translate="no">Bilim UpSkill</li>
-        <li translate="no">OpenAI</li>
-        <li translate="no">Freedom Holding Corp.</li>
+        <li translate="no">
+          <img src="assets/partners/bilim-upskill.webp" alt="">
+          <span>Bilim UpSkill</span>
+        </li>
+        <li translate="no">
+          <img src="assets/partners/openai.svg" alt="">
+          <span>OpenAI</span>
+        </li>
+        <li translate="no">
+          <img src="assets/partners/freedom-holding.svg" alt="">
+          <span>Freedom Holding Corp.</span>
+        </li>
       </ul>
       <h1 translate="no">ChatGPT Edu</h1>
       <p class="project-subtitle"><span lang="ru">Национальный проект по внедрению ИИ в систему образования</span><span lang="kk">Білім беру жүйесіне жасанды интеллектіні енгізу жөніндегі ұлттық жоба</span></p>
