@@ -32,7 +32,6 @@ SOFTWARE.
 body{margin:0;background:#f9faff;color:var(--ink);font:15px/1.5 Inter,"Segoe UI",sans-serif}
 main{width:100%;margin:0}
 
-.bottom{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:10px 18px}
 .stage{position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 18% 32%,#dafaff 0,transparent 60%),radial-gradient(ellipse at 86% 82%,#e7ddff 0,transparent 58%),linear-gradient(135deg,#f8faff,#f1f4ff)}
 svg{display:block;width:100%;height:auto;max-height:54rem}
 .face{cursor:pointer;stroke:#e9ffff;stroke-opacity:.83;stroke-width:1.25;stroke-linejoin:round;vector-effect:non-scaling-stroke;outline:none;transition:filter .15s,stroke .15s}
@@ -55,10 +54,6 @@ svg{display:block;width:100%;height:auto;max-height:54rem}
 .details dl div{display:flex;justify-content:space-between;gap:.5rem}
 .details dd{margin:0;color:var(--ink);font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap}
 .details small{display:block;margin-top:4px;color:var(--muted);font-size:.6875rem;line-height:1.25}
-.bottom{padding:9px clamp(14px,3vw,36px) 14px;color:var(--muted);font-size:12px}
-.legend{display:inline-flex;align-items:center;gap:7px}
-.swatch{width:72px;height:5px;border-radius:10px;background:linear-gradient(90deg,#36cdec,#297af5,#3027ec)}
-a{color:#3531a0;text-underline-offset:2px}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 [hidden]{display:none!important}
 .region-picker{display:none}
@@ -123,11 +118,6 @@ a{color:#3531a0;text-underline-offset:2px}
     </div>
     <div id="announcement" aria-live="polite" class="sr-only"></div>
   </section>
-  <div class="bottom">
-    <span id="freshness" aria-live="polite"></span>
-    <span class="legend" id="legend" aria-label="Белсендірілген лицензиялар саны" hidden>Аз <span class="swatch"></span> Көп</span>
-    <span><a id="report" href="https://app.powerbi.com/view?r=eyJrIjoiYWIxNGIwMmMtNmQxMS00MWIwLTllMGYtNzQ3NzI0MWY1Mzk3IiwidCI6IjQ0YWY2MTM1LTFmMTYtNGU3ZS04MzViLTAwYWY1MTdkZTNmNyIsImMiOjl9&amp;pageName=b29b129cdeed528605f2" target="_blank" rel="noopener">Дереккөз · Power BI</a> · <a href="https://github.com/galymorg/new_qazaqstan_GeoJSON" target="_blank" rel="noopener">Облыс шекаралары</a></span>
-  </div>
 </main>
 <script type="module">
 import { subscribeRegionalLicenses, subscribeRegionalLicenseBreakdown } from './regional-licenses.js?v=20261127-2';
@@ -278,10 +268,9 @@ function render(announce = false) {
   if (announce) document.querySelector('#announcement').textContent = area.node.getAttribute('aria-label');
 }
 
-function applyReadings(counts) {
+function applyReadings({ counts }) {
   const activations = Object.values(counts).map(record => record.activated).filter(isCount);
   const maximum = Math.max(1, ...activations);
-  document.querySelector('#legend').hidden = activations.length === 0;
   for (const [id, {node, city}] of areas) {
     const {activated} = counts[id] || {};
     if (!city) {
@@ -301,27 +290,17 @@ document.addEventListener('keydown', event => {
 const dateFormat = new Intl.DateTimeFormat('kk-KZ', {
   timeZone:'Asia/Qyzylorda', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
 });
-const status = document.querySelector('#freshness');
-
-function showDate(element, label, checkedAt) {
+function showBreakdownDate(label, checkedAt) {
   const parts = Object.fromEntries(dateFormat.formatToParts(new Date(checkedAt)).map(part => [part.type, part.value]));
-  element.textContent = label + ' · ' + [parts.day, parts.month, parts.year].join('.') + ', ' + parts.hour + ':' + parts.minute;
+  breakdownStatus.textContent = label + ' · ' + [parts.day, parts.month, parts.year].join('.') + ', ' + parts.hour + ':' + parts.minute;
 }
 
-const freshnessLabels = {
-  snapshot: 'Power BI деректерінің көшірмесі',
-  live: 'Power BI арқылы тексерілді',
-  cached: 'Соңғы алынған деректер'
-};
-subscribeRegionalLicenses(({ counts, checkedAt, state }) => {
-  applyReadings(counts);
-  showDate(status, freshnessLabels[state], checkedAt);
-});
+subscribeRegionalLicenses(applyReadings);
 
 subscribeRegionalLicenseBreakdown(({ counts, checkedAt, state }) => {
   breakdown = counts;
   if (checkedAt) {
-    showDate(breakdownStatus, state === 'live' ? 'Power BI' : 'Соңғы алынған деректер', checkedAt);
+    showBreakdownDate(state === 'live' ? 'Power BI' : 'Соңғы алынған деректер', checkedAt);
   } else {
     breakdownStatus.textContent = 'Power BI деректері қолжетімсіз';
   }
