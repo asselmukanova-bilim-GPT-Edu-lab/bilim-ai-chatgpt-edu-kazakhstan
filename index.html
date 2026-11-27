@@ -15,8 +15,86 @@
     .licenses-hero { background: #f9faff; }
     html[lang="ru"] #admin-support-card [lang="kk"],
     html[lang="kk"] #admin-support-card [lang="ru"] { display: none; }
-    .capability-grid .feature-card { min-height: 0; }
-    .capability-grid .feature-card h3 { margin: 0; }
+    .capability-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-auto-rows: 1fr;
+      gap: clamp(.75rem, 1.65vw, 1.5rem);
+    }
+    .capability-grid .feature-card {
+      --card-tint: #f0ebff;
+      --card-edge: #e3dcfa;
+      --card-line: #7958de;
+      display: grid;
+      align-content: space-between;
+      justify-items: start;
+      gap: .9rem;
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      min-height: clamp(7.5rem, 10vw, 9.5rem);
+      padding: clamp(1rem, 1.8vw, 1.75rem);
+      border: 1px solid var(--card-edge);
+      border-radius: 1.25rem;
+      background: radial-gradient(ellipse at 100% 0, var(--card-tint), #fff 78%);
+      box-shadow: 0 8px 24px #321e650c;
+    }
+    .capability-grid .feature-card:nth-child(even) {
+      --card-tint: #e8f4ff;
+      --card-edge: #dce8f6;
+      --card-line: #5074c6;
+    }
+    .capability-grid .feature-card::before {
+      content: '';
+      width: 1.65rem;
+      height: 3px;
+      border-radius: 3px;
+      background: var(--card-line);
+    }
+    .capability-grid .feature-card::after {
+      content: '';
+      z-index: -1;
+      position: absolute;
+      inset: 0 0 0 auto;
+      width: min(42%, 7.5rem);
+      background: url('assets/seminar-kazakh-ornament.png') right center / auto 110% no-repeat;
+      filter: grayscale(1);
+      mix-blend-mode: multiply;
+      mask-image: linear-gradient(to right, transparent, #000 42%);
+      pointer-events: none;
+    }
+    .capability-grid .feature-card h3 {
+      margin: 0;
+      max-width: 19ch;
+      font-size: clamp(1.05rem, 1.45vw, 1.3rem);
+      line-height: 1.25;
+      font-weight: 800;
+    }
+    .capability-grid .feature-card:hover {
+      border-color: var(--card-line);
+      box-shadow: 0 12px 28px #321e6517;
+      transform: translateY(-3px);
+    }
+    .capability-grid .feature-card:focus-visible {
+      outline: 2px solid var(--card-line);
+      outline-offset: 3px;
+    }
+    @media (max-width: 64rem) {
+      .capability-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 35rem) {
+      .capability-grid .feature-card {
+        min-height: 6.75rem;
+        padding: .8rem;
+        border-radius: 1rem;
+      }
+      .capability-grid .feature-card h3 { font-size: .975rem; }
+    }
+    @media (max-width: 22rem) {
+      .capability-grid { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .capability-grid .feature-card:hover { transform: none; }
+    }
     .licenses-frame {
       display: block;
       width: 100%;
@@ -61,6 +139,7 @@
           <a class="feature-card" href="social.html"><h3>Социальные сети</h3></a>
           <a class="feature-card" href="statistics.html"><h3>Статистика</h3></a>
           <a class="feature-card" href="#experts"><h3>Чемпионы и тренеры</h3></a>
+          <a class="feature-card" href="materials.html"><h3>Нормативные документы</h3></a>
         </div>
       </div>
     </section>
@@ -126,7 +205,7 @@
     </div>
     <div class="container footer-bottom"><span>© 2026 Bilim AI</span><span>Черновой каркас сайта</span></div>
   </footer>
-  <script src="script.js?v=20261127"></script>
+  <script src="script.js?v=20261127-6"></script>
   <script>
     (() => {
       const frame = document.querySelector('.licenses-frame');

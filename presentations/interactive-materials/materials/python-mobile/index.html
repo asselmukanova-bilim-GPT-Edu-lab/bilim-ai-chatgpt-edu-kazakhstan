@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14283f">
+  <title>Python</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; color: #152940; background: #edf2f7; font-synthesis: none; }
+    * { box-sizing: border-box; }
+    body { min-height: 100dvh; margin: 0; padding: 20px; background: radial-gradient(ellipse at 55% 12%, #fafcfe, #e5edf4 82%); }
+    button { font: inherit; color: inherit; cursor: pointer; min-height: 44px; }
+    button:focus-visible { outline: 3px solid #2871bc; outline-offset: 3px; }
+    button:disabled { cursor: default; opacity: .52; }
+    .app { width: min(100%, 490px); margin: 0 auto; overflow: hidden; isolation: isolate; border: 1px solid #bdcbd9; border-radius: 32px; box-shadow: 0 18px 48px #172d4824; background: #f6f8fb; }
+    .masthead { padding: 21px 24px 17px; background: #14283f; color: #fff; }
+    .masthead-top, .progress-line, .lesson-actions, .lesson-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 2rem; line-height: 1; letter-spacing: -.045em; }
+    .languages { display: flex; background: #203c57; border-radius: 11px; padding: 3px; }
+    .languages button { min-height: 38px; min-width: 48px; border: 0; border-radius: 8px; background: transparent; color: #e6f0ff; font-size: .82rem; font-weight: 750; }
+    .languages button[aria-pressed="true"] { background: #f5f9ff; color: #152940; }
+    .progress-line { margin: 13px 0 5px; color: #e0eaf5; font-size: .81rem; }
+    progress { display: block; width: 100%; height: 6px; border: 0; border-radius: 20px; overflow: hidden; background: #456176; accent-color: #72d6c6; }
+    progress::-webkit-progress-bar { background: #456176; }
+    progress::-webkit-progress-value { background: #72d6c6; }
+    main { padding: 15px 19px 19px; }
+    .topics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-bottom: 13px; }
+    .topic { display: flex; text-align: left; gap: 8px; align-items: center; padding: 4px 9px; width: 100%; border: 1px solid #d3dfea; border-radius: 10px; background: #fff; font-weight: 700; font-size: .83rem; line-height: 1.2; }
+    .topic:hover, .answer:hover { border-color: #4277bb; }
+    .topic[aria-pressed="true"] { border-color: #295cb0; background: #295cb0; color: #fff; }
+    .topic-num { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #dfeafb; color: #244e8e; font-size: .71rem; }
+    .topic[aria-pressed="true"] .topic-num { background: #f0f5ff; }
+    .topic.is-complete:not([aria-pressed="true"]) .topic-num { background: #d9f5ee; color: #086250; }
+    .lesson { padding: 15px; border-radius: 17px; background: #fff; border: 1px solid #dce5ee; }
+    .lesson-top { align-items: baseline; }
+    h2 { font-size: 1.35rem; letter-spacing: -.025em; }
+    .lesson-number { color: #2456a3; font-size: .81rem; font-weight: 800; white-space: nowrap; }
+    .explanation { margin: 5px 0 10px; color: #3c526a; font-size: .88rem; line-height: 1.45; }
+    .code-card { overflow: hidden; border-radius: 11px; background: #14283f; color: #ebf5ff; }
+    .code-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 9px 0 12px; background: #203b56; font-size: .77rem; font-weight: 700; }
+    .code-bar button { border: 0; background: transparent; color: #c9fff1; font-size: .78rem; font-weight: 750; padding: 0 4px; }
+    pre { margin: 0; padding: 9px 12px; overflow: auto; font: .82rem/1.5 ui-monospace, Consolas, monospace; tab-size: 4; }
+    .output { border-top: 1px solid #496379; color: #b7f9e7; white-space: pre-wrap; }
+    .question { margin: 12px 0 6px; font-size: .96rem; line-height: 1.35; }
+    .exercise { padding: 6px 9px; background: #edf3fa; border-radius: 7px; }
+    .answers { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+    .answer { min-width: 54px; flex: 1; padding: 4px 8px; border: 1px solid #cad8e9; background: #fff; border-radius: 8px; font: 700 .83rem ui-monospace, Consolas, monospace; }
+    .answer.wrong { background: #fff0ee; border-color: #c36d64; color: #823019; }
+    .answer.right { background: #d9f5ee; border-color: #218570; color: #075a48; }
+    .feedback { min-height: 1.25em; margin: 6px 0 0; color: #3c526a; font-size: .8rem; line-height: 1.4; }
+    .feedback[data-kind="right"] { color: #075a48; }
+    .feedback[data-kind="wrong"] { color: #823019; }
+    .lesson-actions { margin-top: 11px; }
+    .lesson-actions button { border: 1px solid #ccd9e8; border-radius: 9px; padding: 7px 12px; background: #fff; font-size: .84rem; font-weight: 750; }
+    #next { background: #295cb0; border-color: #295cb0; color: white; }
+    @media (max-width: 540px) {
+      body { padding: 0; background: #f6f8fb; }
+      .app { min-height: 100dvh; border: 0; border-radius: 0; box-shadow: none; }
+      .masthead { padding: 13px 15px; }
+      main { padding: 11px 10px 14px; }
+      .lesson { padding: 12px; }
+    }
+  </style>
+  <script src="trainer.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <header class="masthead">
+      <div class="masthead-top">
+        <h1>Python</h1>
+        <div class="languages" id="languages"><button type="button" data-lang="kk" lang="kk">ҚАЗ</button><button type="button" data-lang="ru" lang="ru">РУС</button></div>
+      </div>
+      <div class="progress-line"><label id="progress-label" for="progress"></label><span id="progress-count"></span></div>
+      <progress id="progress" value="0" max="6" aria-describedby="progress-count"></progress>
+    </header>
+    <main>
+      <nav class="topics" id="topics"></nav>
+      <section class="lesson" aria-labelledby="lesson-title">
+        <div class="lesson-top"><h2 id="lesson-title" tabindex="-1"></h2><span class="lesson-number" id="lesson-number"></span></div>
+        <p class="explanation" id="explanation"></p>
+        <div class="code-card">
+          <div class="code-bar"><span id="example-label"></span><button type="button" id="example-toggle" aria-expanded="false" aria-controls="example-output"></button></div>
+          <pre><code id="example-code"></code></pre>
+          <pre class="output" id="example-output" hidden></pre>
+        </div>
+        <h3 id="question" class="question"></h3>
+        <pre class="exercise"><code id="exercise-code"></code></pre>
+        <div class="answers" id="answers" role="group" aria-labelledby="question"></div>
+        <p id="feedback" class="feedback" role="status"></p>
+        <div class="lesson-actions"><button type="button" id="previous"></button><button type="button" id="next"></button></div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

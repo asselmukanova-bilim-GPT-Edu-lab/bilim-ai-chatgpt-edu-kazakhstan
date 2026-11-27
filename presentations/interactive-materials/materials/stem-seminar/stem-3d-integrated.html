@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3D Model Lab</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:#101923;color:#f1f5f8}
+main{max-width:1200px;margin:auto;padding:16px}h1{font-size:clamp(1.5rem,3vw,2.2rem);margin:0 0 7px}
+p{margin:0;color:#c6d5de;line-height:1.5}.subtitle{max-width:900px}.badge{display:inline-block;font-size:.8rem;margin-top:12px;border:1px solid #668491;border-radius:100px;padding:7px 10px}
+#stage{position:relative;min-height:330px;height:min(68vh,690px);margin:16px 0 12px;border:1px solid #365162;border-radius:16px;overflow:hidden;background:radial-gradient(circle at 48% 38%,#263d4b,#111c28 75%)}
+#stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}#stage canvas:active{cursor:grabbing}
+#labels{position:absolute;inset:0;pointer-events:none}#lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.tag{position:absolute;z-index:1;display:none;white-space:nowrap;padding:5px 8px;border:1px solid #b3d1dc;border-radius:7px;background:#15293de9;color:#fff;font-size:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}button{background:#263b4a;border:1px solid #587082;border-radius:9px;color:#fff;padding:10px 13px;font:inherit;cursor:pointer}button:hover,button[aria-pressed="true"]{background:#39708a}
+.detail{margin-top:12px;border:1px solid #365162;background:#1c2b39;border-radius:12px;padding:15px;min-height:84px}.detail strong{display:block;margin-bottom:6px}
+footer{color:#afc1cc;font-size:.86rem;margin:12px 0}
+@media(max-width:600px){main{padding:10px}#stage{height:58vh;min-height:300px}.tag{font-size:10px;padding:3px 5px}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
+<style id="sites-model-style">body{background:#fff;color:#29272e;color-scheme:light}main h1{color:#754aff}main>p,main footer{color:#756d83}main .badge{border-color:#d6c6ed;color:#67517f;background:#f9f6ff}main #stage{background:radial-gradient(circle at 48% 38%,#faf7ff,#e8def8);border-color:#dcd0ef}main button{background:#fff;border-color:#d6c5ef;color:#63418e}main button:hover,main button[aria-pressed="true"]{background:#ede4ff;color:#5c2ab5}main .detail{background:#f9f6ff;border-color:#ded2ef;color:#29272e}main .detail p{color:#5c506e}.learner-workspace .learner-controls{background:#faf7ff;border-color:#ddcff1;color:#29272e}.learner-workspace .learner-controls h2,.learner-workspace .learner-controls h3{color:#754aff}.learner-workspace .learner-controls p{color:#53465f}.learner-workspace .learner-controls input,.learner-workspace .learner-controls select,.learner-workspace .learner-controls textarea{background:#fff;color:#29272e;border-color:#cfc0e7}.learner-workspace .learner-controls .lab-status{background:#f0e8ff;border-color:#754aff;color:#493264}.learner-workspace .learner-controls .lab-note{color:#806026!important}.learner-workspace .learner-controls td,.learner-workspace .learner-controls th{border-color:#dfd4ee}.learner-workspace .learner-controls th{color:#754aff}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #ffbb00;outline-offset:3px}</style><style>.advanced-bridge-view #stage{min-height:270px;height:clamp(270px,53vh,535px);margin-top:10px}.advanced-bridge-view main>h1{font-size:clamp(1.25rem,2.35vw,1.9rem)}</style><style id="advanced-bridge-paper-photo">
+.advanced-view-switch { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; }
+.advanced-view-switch button[aria-pressed="true"] { color: #fff; background: #6842b3; border-color: #6842b3; }
+.advanced-paper-view { margin: 12px 0 0; }
+.advanced-paper-view[hidden], .advanced-paper-mode :is(#stage,.actions,.detail) { display: none; }
+.advanced-paper-view img { display: block; width: 100%; max-height: 75vh; object-fit: contain; border: 1px solid #dcd0ef; border-radius: 14px; background: #f2edf8; }
+.advanced-paper-view figcaption { padding: 9px 0 3px; color: #51445e; }
+.advanced-parts-key { display: grid; grid-template-columns: repeat(3,minmax(0, 1fr)); gap: 6px 20px; margin: 8px 0 0; padding-left: 24px; color: #453356; font-size: .94rem; }
+@media(max-width:720px) { .advanced-parts-key { grid-template-columns: repeat(2,minmax(0, 1fr)); } }
+@media(max-width:460px) { .advanced-parts-key { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+ <h1 id="title"></h1><p class="subtitle" id="explanation"></p><span class="badge" id="status"></span>
+ <div id="stage" aria-label="Интерактивная 3D-модель: перетаскивайте для вращения и нажмите на деталь"><div id="labels"><svg id="lines" aria-hidden="true"></svg></div></div>
+ <div class="actions"><button id="explode" aria-pressed="false">Разобрать</button><button id="toggleLabels" aria-pressed="false">Показать подписи</button><button id="works">Как это работает</button><button id="reset">Исходный вид</button></div>
+ <section class="detail" aria-live="polite"><strong id="partName">Выберите деталь</strong><p id="partInfo">Нажмите на часть модели. Мышью вращайте, колесом приближайте.</p></section>
+ <footer id="footnote"></footer>
+</main>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+const advancedView = new URLSearchParams(location.search).get('model') === 'advanced';
+document.documentElement.classList.toggle('advanced-bridge-view', advancedView);
+const ADVANCED_COPY = {"title":"Бумажный мост с арочными фермами","explanation":"Модель для старших классов. Две фигурные бумажные фермы, настил с рёбрами и поперечные связи образуют единый каркас. Цветные вставки подчёркивают ритм повторяющихся треугольников.","status":"Учебный 3D-эскиз · размеры условные","footnote":"Модель показывает форму и сборку. Несущую способность определяют испытанием физического прототипа. Для загрузки интерактивного просмотра нужен интернет.","parts":[["Опоры и пролёт","Две опоры задают пролёт. При сравнении прототипов расстояние между опорами и положение нагрузки сохраняют одинаковыми."],["Лист настила","Плоский бумажный лист образует настил. Цветные полосы обозначают его продольные кромки."],["Парные арочные фермы","Ломаные верхние пояса и диагонали образуют две одинаковые боковые фермы с повторяющимися треугольниками."],["Поперечные связи","Поперечины соединяют две фермы сверху. Диагональные связи образуют кресты над настилом."],["Декоративные вставки","Бирюзовые и золотистые элементы выделяют рисунок конструкции. Их можно менять, сохраняя геометрию каркаса."],["Поперечные рёбра под настилом","Под настилом расположены отдельные бумажные полосы, сложенные буквой V. В разнесённом виде можно рассмотреть каждый сгиб."]],"stages":["Задайте одинаковый пролёт для сравниваемых моделей.","Рассмотрите плоский настил и его продольные кромки.","Проследите, как повторяющиеся треугольники соединяют верхний и нижний пояса.","Найдите связи, которые соединяют две боковые фермы.","Предложите свою цветовую композицию и обоснуйте размещение акцентов.","Рассмотрите V-образный сгиб и положение каждого ребра под настилом."],"button":"Открыть арочный мост в 3D ↗"};
+function buildAdvanced({ THREE, addPart }) {
+  const paper = (color) => new THREE.MeshStandardMaterial({ color, roughness: .83, side: THREE.DoubleSide });
+  const ivory = paper(0xece1c9);
+  const edge = paper(0xbeb096);
+  const purple = paper(0x5e3996);
+  const midPurple = paper(0x9165c2);
+  const teal = paper(0x219eab);
+  const gold = paper(0xd79b32);
+  const stone = paper(0x9a89a9);
+  const sand = paper(0xe0d2ba);
+  const slab = (group, size, point, material) => {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
+    mesh.position.set(...point);
+    group.add(mesh);
+    return mesh;
+  };
+  const beam = (group, start, end, thickness, depth, material) => {
+    const a = new THREE.Vector3(...start);
+    const b = new THREE.Vector3(...end);
+    const direction = b.clone().sub(a);
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(direction.length() + thickness * .16, thickness, depth), material);
+    mesh.position.copy(a.addScaledVector(direction, .5));
+    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(1, 0, 0), direction.normalize());
+    group.add(mesh);
+  };
+  const register = (index, explode, anchor) => {
+    const group = new THREE.Group();
+    const [name, info] = ADVANCED_COPY.parts[index];
+    return { name, info, group, explode, anchor };
+  };
+
+  const supports = register(0, [0, -.85, 0], [3.05, .68, 1.13]);
+  slab(supports.group, [8.6, .09, 4.0], [0, -.12, 0], sand);
+  for (const x of [-3.12, 3.12]) {
+    slab(supports.group, [.82, .67, 2.88], [x, .28, 0], stone);
+    slab(supports.group, [.94, .13, 3.06], [x, .69, 0], sand);
+    slab(supports.group, [.95, .11, 3.15], [x, -.02, 0], sand);
+  }
+  addPart(supports);
+
+  const deck = register(1, [0, .32, 0], [0, .98, 1.36]);
+  slab(deck.group, [7.0, .095, 2.46], [0, .94, 0], ivory);
+  const underdeck = register(5, [0, -.23, 0], [.35, .88, 1.19]);
+  const fold = new THREE.Shape();
+  [[-.13,.018],[0,-.105],[.13,.018],[.112,.031],[0,-.075],[-.112,.031]].forEach(([x,y],i)=>i?fold.lineTo(x,y):fold.moveTo(x,y));
+  fold.closePath();
+  const ribGeometry = new THREE.ExtrudeGeometry(fold, {depth:2.38, bevelEnabled:false});
+  ribGeometry.translate(0, 0, -1.19);
+  for (let i = 0; i < 13; i++) {
+    const rib = new THREE.Mesh(ribGeometry, i % 2 ? ivory : edge);
+    rib.position.set(-3.22 + i * .535, .887, 0);
+    underdeck.group.add(rib);
+  }
+  addPart(underdeck);
+  for (const z of [-1.24, 1.24]) {
+    slab(deck.group, [7.05, .12, .12], [0, .937, z], purple);
+    slab(deck.group, [6.96, .022, .023], [0, .99, z * .91], gold);
+  }
+  addPart(deck);
+
+  const trusses = register(2, [0, .81, 0], [-1.05, 2.81, 1.16]);
+  const xs = [-3.42, -2.30, -1.15, 0, 1.15, 2.30, 3.42];
+  const heights = [1.17, 2.16, 2.71, 2.89, 2.71, 2.16, 1.17];
+  const topAt = (i, z) => [xs[i], heights[i], z];
+  const bottomAt = (i, z) => [xs[i], 1.02, z];
+  for (const z of [-1.19, 1.19]) {
+    beam(trusses.group, bottomAt(0, z), bottomAt(xs.length - 1, z), .14, .18, purple);
+    xs.slice(1).forEach((_, index) => {
+      const i = index + 1;
+      beam(trusses.group, topAt(i - 1, z), topAt(i, z), .165, .20, purple);
+      beam(trusses.group, topAt(i - 1, z), topAt(i, z), .041, .04, ivory);
+      const rising = index % 2 === 0;
+      beam(trusses.group, rising ? bottomAt(i - 1, z) : topAt(i - 1, z), rising ? topAt(i, z) : bottomAt(i, z), .113, .128, midPurple);
+    });
+    for (let i = 1; i < xs.length - 1; i++) {
+      beam(trusses.group, bottomAt(i, z), topAt(i, z), .082, .095, ivory);
+      slab(trusses.group, [.112, .12, .23], topAt(i, z), gold);
+    }
+  }
+  addPart(trusses);
+
+  const braces = register(3, [0, 2.0, 0], [0, 2.94, 0]);
+  for (let i = 1; i < xs.length - 1; i++) {
+    beam(braces.group, topAt(i, -1.15), topAt(i, 1.15), .098, .114, teal);
+    if (i < xs.length - 2) {
+      beam(braces.group, topAt(i, -1.15), topAt(i + 1, 1.15), .067, .078, ivory);
+      beam(braces.group, topAt(i, 1.15), topAt(i + 1, -1.15), .067, .078, ivory);
+    }
+  }
+  addPart(braces);
+
+  const ornaments = register(4, [0, .28, 1.25], [.62, 1.48, 1.31]);
+  for (const z of [-1.31, 1.31]) {
+    slab(ornaments.group, [6.78, .34, .06], [0, 1.12, z], ivory);
+    for (let i = 0; i < 6; i++) {
+      const x = (xs[i] + xs[i + 1]) * .5;
+      const y = 1.13;
+      const face = z + Math.sign(z) * .043;
+      const marker = slab(ornaments.group, [.20, .20, .041], [x, y, face], i % 2 === 0 ? teal : gold);
+      marker.rotation.z = Math.PI / 4;
+      if (i > 0 && i < 5) {
+        beam(ornaments.group, [x - .26, y - .12, face], [x, y + .15, face], .042, .041, teal);
+        beam(ornaments.group, [x, y + .15, face], [x + .26, y - .12, face], .042, .041, teal);
+      }
+    }
+  }
+  addPart(ornaments);
+}
+const MODEL = advancedView ? {
+ title: ADVANCED_COPY.title, explanation: ADVANCED_COPY.explanation, status: ADVANCED_COPY.status, footnote: ADVANCED_COPY.footnote,
+ build: buildAdvanced,
+ stages: [0,1,5,2,3,4].map(index => ({part: ADVANCED_COPY.parts[index][0], text: ADVANCED_COPY.stages[index]}))
+} : {
+title:"Общая STEM-модель · бумажный мост",
+explanation:"Один объект, общие данные и связанный результат: потребность → конструкция → наблюдение → таблица → расчёт → обоснование.",
+status:"Реалистичная учебная реконструкция · не точная CAD-модель",
+footnote:"Учебный макет: форма, толщина и размеры приблизительны. Любые числа отмечены как условные. Для просмотра нужен интернет: Three.js загружается с CDN. Вращение — перетаскивание, масштаб — колесо мыши.",
+
+build({THREE,addPart}) {
+ const focus="integrated";
+ const ivory=new THREE.MeshStandardMaterial({color:0xeee8d9,roughness:.94,side:THREE.DoubleSide});
+ const metal=new THREE.MeshStandardMaterial({color:0x929ca4,metalness:.8,roughness:.32});
+ const dark=new THREE.MeshStandardMaterial({color:0x22384a,roughness:.7});
+ const teal=new THREE.MeshStandardMaterial({color:0x48bea9,roughness:.5});
+ const amber=new THREE.MeshStandardMaterial({color:0xf0b960,roughness:.55});
+ function woodTexture(){const c=document.createElement('canvas');c.width=256;c.height=256;const ctx=c.getContext('2d');ctx.fillStyle='#b68b5c';ctx.fillRect(0,0,256,256);for(let i=0;i<85;i++){ctx.strokeStyle=i%3?'#987348':'#cba678';ctx.lineWidth=i%4?.7:1.5;ctx.beginPath();for(let x=0;x<=256;x+=8){const y=i*3+Math.sin(x*.025+i)*2.4; x?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke()}const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t}
+ const wood=new THREE.MeshStandardMaterial({map:woodTexture(),roughness:.76});
+ function block(w,h,d,mat){const x=-w/2,y=-h/2,r=Math.min(.06,w/8,h/8);const s=new THREE.Shape();s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);const g=new THREE.ExtrudeGeometry(s,{depth:d,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.015,bevelThickness:.015});g.translate(0,0,-d/2);return new THREE.Mesh(g,mat)}
+ function line(points,color=0x8d9bad){return new THREE.Line(new THREE.BufferGeometry().setFromPoints(points.map(p=>new THREE.Vector3(...p))),new THREE.LineBasicMaterial({color}))}
+ function labelPlane(lines,w,h){const c=document.createElement('canvas');c.width=1024;c.height=640;const ctx=c.getContext('2d');ctx.fillStyle='#f2f0e7';ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle='#153546';ctx.textBaseline='middle';ctx.font='bold 38px Arial';lines.forEach((s,i)=>{ctx.font=i===0?'bold 42px Arial':'32px Arial';ctx.fillStyle=i===0?'#117b70':'#153546';ctx.fillText(s,35,65+i*75)});const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshStandardMaterial({map:t,roughness:1,side:THREE.DoubleSide}))}
+ const builtParts=[];function assembly(name,info,group,explode,anchor){addPart({name,info,group,explode,anchor});builtParts.push(group);return group}
+ const base=new THREE.Group();const tabletop=block(7.9,.16,4.7,wood);tabletop.position.y=-.13;base.add(tabletop);assembly('Рабочий стол','Ровная поверхность для сравнения моделей; условия испытаний должны быть одинаковыми.',base,[0,-.5,0],[0,0,2.2]);
+ [-1,1].forEach((sign,i)=>{const group=new THREE.Group();group.position.set(sign*2.25,.5,0);group.add(block(.65,1,2.8,wood));const pad=block(.7,.04,2.9,dark);pad.position.y=.52;group.add(pad);for(let k=0;k<4;k++){const grain=line([[-.33,-.35+k*.22,1.411],[.33,-.31+k*.22,1.411]],0x8c633b);group.add(grain)}assembly(i?'Правая опора':'Левая опора','Две одинаковые опоры задают пролёт. В учебном задании расстояние между внутренними краями устанавливают линейкой на 15 см.',group,[sign*.65,0,0],[0,.6,0])});
+ function paperMesh(corrugated,sag=0,folds=8){const vertices=[],indices=[],nx=72,nz=32;for(let ix=0;ix<=nx;ix++){const x=-2.7+5.4*ix/nx;for(let iz=0;iz<=nz;iz++){const z=-1.25+2.5*iz/nz;const fold=corrugated?(Math.abs(((iz/nz*folds)%1)-.5)*2-.5)*.28:0;const bend=Math.max(0,1-(x/2.35)**2);vertices.push(x,1.115+fold-sag*bend,z)}}for(let ix=0;ix<nx;ix++)for(let iz=0;iz<nz;iz++){let a=ix*(nz+1)+iz,b=a+nz+1;indices.push(a,b,a+1,a+1,b,b+1)}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();const mesh=new THREE.Mesh(g,ivory.clone());mesh.userData.original=Float32Array.from(vertices);return mesh}
+ const paper=new THREE.Group();const sheet=paperMesh(focus!=='s');paper.add(sheet);const edge=new THREE.LineSegments(new THREE.EdgesGeometry(sheet.geometry,28),new THREE.LineBasicMaterial({color:0xb8b0a0,transparent:true,opacity:.7}));paper.add(edge);paper.userData.sheet=sheet;paper.userData.edge=edge;assembly('Бумажный пролёт','Тонкий лист и продольные сгибы образуют несущую часть. Геометрия и толщина показаны приблизительно; это не расчёт прочности.',paper,[0,1.1,0],[0,1.35,-.5]);
+ const load=new THREE.Group();load.position.set(0,1.21,0);const tray=block(.85,.065,.85,dark);load.add(tray);for(let i=0;i<3;i++){const cylinder=new THREE.Mesh(new THREE.CylinderGeometry(.26,.26,.12,48),metal);cylinder.position.y=.10+i*.13;load.add(cylinder);const ring=new THREE.Mesh(new THREE.TorusGeometry(.21,.008,8,48),dark);ring.rotation.x=Math.PI/2;ring.position.y=.162+i*.13;load.add(ring)}load.userData.startY=load.position.y;assembly('Набор одинаковых грузов','Грузы добавляются постепенно. Их вид иллюстративный, массу по изображению определить нельзя. Испытания проводят на столе и прекращают при заметной деформации.',load,[0,1.8,0],[0,.55,0]);
+ const ruler=new THREE.Group();ruler.position.set(0,.15,1.82);ruler.add(block(5.2,.055,.33,new THREE.MeshStandardMaterial({color:0xc8b486,roughness:.7})));for(let i=0;i<=30;i++){let x=-2.25+i*.15;ruler.add(line([[x,.038,-.14],[x,.038,i%2===0?.09:-.01]],0x332b23))}const rulerText=labelPlane(['Пролёт в задании — 15 см','Сравнивайте одинаковые условия'],3.9,.52);rulerText.rotation.x=-Math.PI/2;rulerText.position.set(0,.045,.5);ruler.add(rulerText);assembly('Измерительная линейка','Проверка одинакового пролёта и положения нагрузки. Размеры 3D-реконструкции условны; линейка на столе нужна в реальном опыте.',ruler,[0,0,1],[0,.06,0]);
+ if(focus==='e'){
+   const sketches=new THREE.Group();sketches.position.set(0,2.4,-1.75);const plate=labelPlane(['Два эскиза — одно ограничение','А: плоский лист','Б: продольные сгибы','Выбор → испытание → улучшение'],4.5,2.4);sketches.add(plate);assembly('Эскизы конструкции','Сначала сравните варианты по задаче, а не по внешнему виду. После испытания измените один параметр и повторите измерение.',sketches,[0,.6,-.8],[0,1.3,0]);
+ }
+ if(focus==='m'){
+   const chart=new THREE.Group();chart.position.set(0,0,-1.55);
+   const board=labelPlane(['УСЛОВНЫЕ ДАННЫЕ','Плоский: 2, 3, 2 груза','Со сгибами: 5, 6, 5 грузов','Средние: 2,33 и 5,33','В опыте получите свои данные'],5.2,2.9);board.position.set(0,2.4,-.6);chart.add(board);
+   [2.33,5.33].forEach((v,i)=>{const h=v*.20;const bar=block(.55,h,.55,i?teal:amber);bar.position.set(i?.6:-.6,h/2,.12);chart.add(bar)});
+   assembly('Диаграмма результатов','Это учебный набор, не результат реальных испытаний. Сначала собирают данные, затем считают среднее и объясняют различия. Высота столбцов пропорциональна средним 2,33 и 5,33.',chart,[0,0,-1],[0,3.95,-.6]);
+ }
+ if(focus==='t'){
+   const data=new THREE.Group();data.position.set(0,2.3,-1.8);const before=2,after=5,delta=after-before;
+   const screen=labelPlane(['УЧЕБНАЯ ТАБЛИЦА','B2: до = '+before+'   C2: после = '+after,'D2: =C2-B2 → '+delta,'Проверьте: 5 − 2 = 3','Замените числа данными опыта'],5.4,2.9);data.add(screen);
+   const frame=block(5.65,3.12,.10,dark);frame.position.z=-.09;data.add(frame);
+   for(let x=-2.45;x<2.5;x+=.6){data.add(line([[x,-1.43,.02],[x,1.43,.02]],0xc5d0ca))}
+   assembly('Таблица и формула','Пример формулы электронной таблицы: D2=C2−B2. Числа 2 и 5 условны; результат 3 вычислен. Изменение числа грузов не равно автоматически изменению силы без знания их массы.',data,[0,.6,-1],[0,1.7,0]);
+ }
+ // Object-specific learner workspace; the viewer keeps its existing controls.
+ const stageNode=document.getElementById('stage');
+ const workspace=document.createElement('div');workspace.className='learner-workspace';
+ stageNode.parentNode.insertBefore(workspace,stageNode);
+ const ui=document.createElement('section');ui.className='learner-controls';ui.setAttribute('aria-label','Действия ученика');
+ workspace.append(stageNode,ui);
+ const style=document.createElement('style');style.textContent=`
+ .learner-workspace{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr);gap:14px;margin-top:14px}.learner-workspace #stage{margin:0;height:650px;min-height:400px}.learner-controls{max-height:650px;overflow:auto;padding:18px;border:1px solid #476578;border-radius:14px;background:#182a38}.learner-controls h2{font-size:22px;margin:0 0 12px;color:#65dfc5}.learner-controls h3{font-size:18px;margin:17px 0 9px}.learner-controls p{font-size:15px;margin:10px 0}.learner-controls label{display:block;margin:12px 0;font-size:15px}.learner-controls input,.learner-controls select,.learner-controls textarea{width:100%;box-sizing:border-box;color:#f3f6fa;background:#101c26;border:1px solid #7b96a5;border-radius:7px;padding:9px;font:inherit;margin-top:5px}.learner-controls textarea{min-height:70px;resize:vertical}.learner-controls button{font-size:14px;margin:4px 4px 4px 0}.learner-controls button:disabled{opacity:.4;cursor:default}.learner-controls table{width:100%;border-collapse:collapse;font-size:13px}.learner-controls td,.learner-controls th{text-align:left;border-bottom:1px solid #456071;padding:7px 4px}.lab-status{padding:10px;border-left:3px solid #65dfc5;background:#203a49;min-height:40px;white-space:pre-wrap}.lab-note{font-size:13px!important;color:#eac78a!important}.lab-sketch{display:block;width:100%;height:100px;background:#faf7eb;border-radius:7px;touch-action:none;cursor:crosshair}.learner-controls .paired{display:grid;grid-template-columns:1fr 1fr;gap:10px}.learner-controls .mono{font-family:monospace}@media(max-width:850px){.learner-workspace{grid-template-columns:1fr}.learner-workspace #stage{height:450px;min-height:330px}.learner-controls{max-height:none}}`;
+ document.head.append(style);
+ const $lab=id=>ui.querySelector('#'+id);
+ const safe=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const findPart=name=>builtParts.find(p=>p.userData.model.name===name);
+ load.children.forEach(child=>child.userData.restY=child.position.y);
+ const originalTray=load.children[0];
+ // Six identical visual weights, each with its own rim. Count is a teaching unit, not grams.
+ while(load.children.length<13){const i=(load.children.length-1)/2;const w=new THREE.Mesh(new THREE.CylinderGeometry(.26,.26,.12,48),metal);w.position.y=.10+i*.13;w.userData.restY=w.position.y;load.add(w);const ring=new THREE.Mesh(new THREE.TorusGeometry(.21,.008,8,48),dark);ring.rotation.x=Math.PI/2;ring.position.y=.162+i*.13;ring.userData.restY=ring.position.y;load.add(ring)}
+ let currentSag=0,animation=0;
+ function deform(sag){const mesh=paper.userData.sheet,original=mesh.userData.original,positions=mesh.geometry.attributes.position;for(let i=0;i<positions.count;i++){const x=original[i*3];positions.setY(i,original[i*3+1]-sag*Math.max(0,1-(x/2.35)**2))}positions.needsUpdate=true;mesh.geometry.computeVertexNormals();paper.userData.edge.geometry.dispose();paper.userData.edge.geometry=new THREE.EdgesGeometry(mesh.geometry,28);paper.userData.edge.visible=true;load.children.forEach(child=>child.position.y=child.userData.restY-sag);currentSag=sag;}
+ function setSag(target){cancelAnimationFrame(animation);const from=currentSag,start=performance.now();function tick(now){const t=Math.min(1,(now-start)/650);deform(from+(target-from)*(t*t*(3-2*t)));if(t<1)animation=requestAnimationFrame(tick)}animation=requestAnimationFrame(tick)}
+ function setLoad(count){load.children.forEach((child,i)=>child.visible=i===0?count>0:Math.floor((i-1)/2)<count)}
+ function setShape(shape){const fresh=paperMesh(shape!=='flat',0,shape==='fold4'?4:8);paper.userData.sheet.geometry.dispose();paper.userData.sheet.geometry=fresh.geometry;paper.userData.sheet.userData.original=fresh.userData.original;deform(currentSag)}
+ function updateBoard(name,lines){const part=findPart(name);if(!part)return;const display=part.children.find(m=>m.isMesh&&m.geometry.type==='PlaneGeometry');if(!display)return;const next=labelPlane(lines,1,1);display.material.map?.dispose();display.material.dispose();display.material=next.material;next.geometry.dispose()}
+ function exportResult(data){const blob=new Blob([JSON.stringify({subject:focus,title:MODEL.title,notice:'Результат учебной работы. Виртуальные данные не являются измерениями реальной бумаги.',...data},null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='STEM-'+focus+'-result.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+ const intro='<h2>Выполните действия ученика</h2><p class="lab-note">Виртуальная учебная установка. Она не рассчитывает реальную прочность бумаги. Записи сохраняйте кнопкой «Скачать результат» до закрытия окна.</p>';
+ ui.innerHTML=`<h2>Один мост — общий результат</h2><p class="lab-note">Геометрия и прогиб иллюстративны. Нагрузочная способность не рассчитывается. Реальные измерения вводите после опыта с бумагой.</p>
+ <h3>1. E · Спроектируйте решение</h3><label>Для кого и зачем нужен мост?<textarea id="purpose" placeholder="Например: модель перехода для школьного макета"></textarea></label><label>Две идеи и обоснование выбора<textarea id="design" placeholder="А — плоский лист; Б — сгибы. Что проверим и почему?"></textarea></label><label>Показать форму<select id="shape"><option value="flat">Плоский лист</option><option value="fold4">4 сгиба</option><option value="fold8">8 сгибов</option></select></label>
+ <h3>2. S · Наблюдайте деформацию</h3><label>Заданный сценарий<select id="behavior"><option value="elastic">Форма восстанавливается</option><option value="residual">Остаётся деформация</option></select></label><button id="apply" type="button">Приложить малую нагрузку</button><button id="unload" type="button" disabled>Снять нагрузку</button><p id="lab-message" class="lab-status" aria-live="polite">Выберите форму и приложите нагрузку.</p><label>Признаки деформации<textarea id="observation" placeholder="Что изменилось после снятия нагрузки?"></textarea></label>
+ <h3>3. M · Соберите общую таблицу</h3><p>Условия реального опыта: один лист А4, пролёт 15 см, одинаковые грузы и положение нагрузки. Для повторов берите новые одинаковые модели.</p><label>Этап<select id="version"><option value="before">До улучшения</option><option value="after">После улучшения</option></select></label><label>Реальное число грузов до заметного прогиба<input id="measurement" type="number" min="0" step="1"></label><button id="record" type="button">Записать измерение</button><button id="sample" type="button">Загрузить учебный пример</button><label>Источник данных<select id="source"><option value="real">Реальные измерения</option><option value="demo">Условный пример</option></select></label><table><thead><tr><th>Этап</th><th>Форма</th><th>Грузы</th></tr></thead><tbody id="results"></tbody></table>
+ <h3>4. T · Рассчитайте и проверьте</h3><p>В общей таблице B2 — среднее до улучшения, C2 — после. Разница: <strong>=C2-B2</strong>.</p><p id="calculation"></p><label>Результат ручной проверки<input id="manual" type="number" step="any"></label><button id="check" type="button">Сверить расчёт</button>
+ <h3>5. Общий результат</h3><label>Какое изменение помогло и какие данные это подтверждают?<textarea id="conclusion" placeholder="Свяжите выбор конструкции, наблюдение и числа. Если данных мало, укажите следующий опыт."></textarea></label><details><summary>Что проверяет учитель</summary><p>Связь решения с потребностью; два варианта конструкции; одинаковые условия; самостоятельные наблюдения; повторные измерения; формулу и ручную проверку; вывод с опорой на данные.</p></details><button id="save" type="button">Скачать общий результат</button>`;
+ let rows=[],loaded=false,activeScenario='elastic';
+ const shapeNames={flat:'Плоский лист',fold4:'4 сгиба',fold8:'8 сгибов'};
+ function means(){const selected=rows.filter(r=>r.source===$lab('source').value);return ['before','after'].map(v=>{const list=selected.filter(r=>r.version===v);return list.length?list.reduce((s,r)=>s+r.count,0)/list.length:null})}
+ function render(){const selected=rows.filter(r=>r.source===$lab('source').value);$lab('results').innerHTML=selected.map(r=>'<tr><td>'+(r.version==='before'?'До':'После')+'</td><td>'+shapeNames[r.shape]+'</td><td>'+r.count+'</td></tr>').join('');const [b,a]=means();$lab('calculation').textContent=b===null||a===null?'Добавьте данные до и после улучшения.':'B2 = '+b.toFixed(2)+'; C2 = '+a.toFixed(2)+'; разница = '+(a-b).toFixed(2)+' грузов. Расчёт ведётся по неокруглённым средним.';}
+ function resetView(){loaded=false;setLoad(0);setSag(0);$lab('unload').disabled=true;setShape($lab('shape').value)}
+ $lab('shape').onchange=resetView;$lab('behavior').onchange=resetView;
+ $lab('apply').onclick=()=>{loaded=true;activeScenario=$lab('behavior').value;setLoad(1);setSag(.16);$lab('unload').disabled=false;$lab('lab-message').textContent='Иллюстративный прогиб. Снимите нагрузку и опишите изменение формы.'};
+ $lab('unload').onclick=()=>{if(!loaded)return;setLoad(0);setSag(activeScenario==='elastic'?0:.08);loaded=false;$lab('unload').disabled=true;$lab('lab-message').textContent=activeScenario==='elastic'?'Форма восстановилась в заданном сценарии. Запишите наблюдение.':'В заданном сценарии остался прогиб. Запишите наблюдение.'};
+ $lab('record').onclick=()=>{const raw=$lab('measurement').value,n=Number(raw);if(raw===''||!Number.isInteger(n)||n<0){$lab('lab-message').textContent='Введите целое неотрицательное число из реального опыта.';return}rows.push({source:'real',version:$lab('version').value,shape:$lab('shape').value,count:n});$lab('source').value='real';$lab('measurement').value='';render()};
+ $lab('sample').onclick=()=>{rows=rows.filter(r=>r.source!=='demo');for(const [version,shape,values] of [['before','flat',[2,3,2]],['after','fold8',[5,6,5]]])for(const count of values)rows.push({source:'demo',version,shape,count});$lab('source').value='demo';render();$lab('lab-message').textContent='Загружены заранее заданные учебные числа. Они не получены расчётом или испытанием 3D-модели.'};
+ $lab('source').onchange=render;
+ $lab('check').onclick=()=>{const [b,a]=means(),raw=$lab('manual').value,n=Number(raw);$lab('lab-message').textContent=b===null||a===null?'Сначала соберите данные обоих этапов.':raw===''?'Введите результат ручной проверки.':Math.abs(n-(a-b))<=.011?'Ручной расчёт совпадает с формулой с точностью 0,01.':'Проверьте порядок вычитания и средние значения.'};
+ $lab('save').onclick=()=>exportResult({purpose:$lab('purpose').value,design:$lab('design').value,observation:$lab('observation').value,measurements:rows,selectedSource:$lab('source').value,formula:'=C2-B2',manualCheck:$lab('manual').value,conclusion:$lab('conclusion').value});
+ document.getElementById('reset').addEventListener('click',resetView);resetView();render();
+
+},stages:[{part:'Бумажный пролёт',text:'E: сравните две идеи и выберите форму по ограничениям. Эта же конструкция станет объектом наблюдения и источником данных.'},{part:'Набор одинаковых грузов',text:'S: приложите и снимите малую нагрузку кнопками панели. Вид деформации задаётся учебным сценарием, а не расчётом материала.'},{part:'Измерительная линейка',text:'M и T: сохраняйте условия повторов, запишите реальные измерения в общую таблицу и проверьте формулу разницы. Затем обоснуйте улучшение.'}]};
+const $ = id => document.getElementById(id);
+$('title').textContent = MODEL.title;
+$('explanation').textContent = MODEL.explanation || '';
+$('status').textContent = MODEL.status || 'Учебная реконструкция — не точная CAD-модель';
+$('footnote').textContent = MODEL.footnote || 'Учебная модель: некоторые размеры и детали могут быть приближёнными.';
+document.title = MODEL.title + ' · 3D Model Lab';
+
+const stage=$('stage'),scene=new THREE.Scene(),objectRoot=new THREE.Group();scene.add(objectRoot);
+const camera=new THREE.PerspectiveCamera(42,1,.01,1000);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+stage.prepend(renderer.domElement);
+const orbit=new OrbitControls(camera,renderer.domElement);orbit.enableDamping=true;orbit.dampingFactor=.08;
+scene.add(new THREE.HemisphereLight(0xe1edf5,0x4c5c68,2.2));
+const key=new THREE.DirectionalLight(0xffffff,3);key.position.set(6,8,7);scene.add(key);
+const fill=new THREE.DirectionalLight(0x91bcd1,1.4);fill.position.set(-7,3,-5);scene.add(fill);
+
+const parts=[],meshToPart=new WeakMap(),tags=[];
+function addPart({name,info,group,explode=[0,0,0],anchor=null}){
+ if(!name||!group?.isGroup)throw new Error('Every named part needs a THREE.Group');
+ objectRoot.add(group);
+ const meshes=[];
+ group.traverse(node=>{if(node.isMesh){meshToPart.set(node,group);meshes.push(node)}});
+ if(!meshes.length)throw new Error('A selectable part needs visible geometry: '+name);
+ group.userData.model={name,info:info||'',base:group.position.clone(),explode:new THREE.Vector3(...explode),anchor:anchor?new THREE.Vector3(...anchor):null};
+ parts.push(group);
+ const tag=document.createElement('span');tag.className='tag';tag.textContent=name;$('labels').append(tag);
+ const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('stroke','#afcad7');line.setAttribute('stroke-width','1');$('lines').append(line);
+ tags.push({group,tag,line});return group;
+}
+// MODEL.build creates object-specific geometry and calls addPart for meaningful assemblies.
+MODEL.build({THREE,scene,objectRoot,addPart});
+if(!parts.length)throw new Error('The model has no selectable parts');
+if(!Array.isArray(MODEL.stages)||!MODEL.stages.length)throw new Error('How it works needs object-specific stages');
+for(const s of MODEL.stages)if(!parts.some(p=>p.userData.model.name===s.part)||!s.text)throw new Error('Invalid explanation stage: '+s.part);
+scene.updateMatrixWorld(true);
+for(const group of parts){
+ const d=group.userData.model;if(d.anchor)continue;
+ const b=new THREE.Box3().setFromObject(group),world=b.getCenter(new THREE.Vector3());world.y=b.max.y;
+ d.anchor=group.worldToLocal(world);
+}
+
+const bounds=new THREE.Box3().setFromObject(objectRoot);
+const center=bounds.getCenter(new THREE.Vector3());objectRoot.position.sub(center);
+const sphere=bounds.getBoundingSphere(new THREE.Sphere());const radius=Math.max(.55,sphere.radius);
+const flowMarkers=MODEL.stages.map(s=>{
+ if(!s.path)return null;
+ if(!Array.isArray(s.path)||s.path.length<2||s.path.some(p=>!Array.isArray(p)||p.length!==3))throw new Error('Invalid demonstration path: '+s.part);
+ const curve=new THREE.CatmullRomCurve3(s.path.map(p=>new THREE.Vector3(...p)));
+ const color=s.pathColor||0xffc86c;
+ const route=new THREE.Mesh(new THREE.TubeGeometry(curve,48,radius*.008,8,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.7}));
+ const marker=new THREE.Mesh(new THREE.SphereGeometry(radius*.05,16,10),new THREE.MeshBasicMaterial({color}));
+ route.visible=false;marker.visible=false;objectRoot.add(route,marker);
+ return {curve,route,marker};
+});
+const initialDirection=new THREE.Vector3(1.25,.85,1.65).normalize();
+function fit(){
+ const narrow=Math.min(1,camera.aspect),half=Math.atan(Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*narrow);
+ const framing=advancedView?(camera.aspect>1.35?.79:1.02):1.16;
+ const distance=radius/Math.max(.12,Math.sin(half))*framing;
+ camera.position.copy(initialDirection).multiplyScalar(distance);orbit.target.set(0,0,0);
+ orbit.minDistance=radius*.3;orbit.maxDistance=radius*10;orbit.update();
+}
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)}
+new ResizeObserver(resize).observe(stage);resize();fit();
+
+let selected=null,disassembled=false,labelsOn=false,step=-1,down=null;
+const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
+renderer.domElement.addEventListener('pointerdown',event=>{down={x:event.clientX,y:event.clientY}});
+renderer.domElement.addEventListener('pointerup',event=>{
+ if(!down)return;
+ const moved=Math.hypot(event.clientX-down.x,event.clientY-down.y);down=null;
+ if(moved>7)return;
+ const r=renderer.domElement.getBoundingClientRect();pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);
+ raycaster.setFromCamera(pointer,camera);const hit=raycaster.intersectObjects(parts,true).find(h=>meshToPart.has(h.object));
+ if(hit)select(meshToPart.get(hit.object));
+});
+function select(group){
+ if(selected)selected.traverse(n=>{if(n.isMesh&&n.userData.originalMaterial){n.material.dispose();n.material=n.userData.originalMaterial;delete n.userData.originalMaterial}});
+ selected=group;if(!group)return;
+ group.traverse(n=>{if(n.isMesh&&n.material.emissive){n.userData.originalMaterial=n.material;n.material=n.material.clone();n.material.emissive.add(new THREE.Color(0x233b4c))}});
+ $('partName').textContent=group.userData.model.name;$('partInfo').textContent=group.userData.model.info;
+}
+function press(id,on){$(id).setAttribute('aria-pressed',String(on))}
+$('explode').onclick=()=>{disassembled=!disassembled;press('explode',disassembled);$('explode').textContent=disassembled?'Собрать':'Разобрать'};
+$('toggleLabels').onclick=()=>{labelsOn=!labelsOn;press('toggleLabels',labelsOn);$('toggleLabels').textContent=labelsOn?'Скрыть подписи':'Показать подписи'};
+$('works').onclick=()=>{
+ const stages=MODEL.stages;
+ step=(step+1)%stages.length;const s=stages[step],group=parts.find(p=>p.userData.model.name===s.part);
+ flowMarkers.forEach((f,i)=>{if(f)f.route.visible=f.marker.visible=i===step});
+ if(group)select(group);$('partName').textContent=`Как это работает · ${step+1}/${stages.length}`;$('partInfo').textContent=s.text;
+};
+$('reset').onclick=()=>{step=-1;flowMarkers.forEach(f=>{if(f)f.route.visible=f.marker.visible=false});if(typeof MODEL.animateStage==='function')MODEL.animateStage({time:0,step:-1,parts,THREE});disassembled=false;labelsOn=false;press('explode',false);press('toggleLabels',false);$('explode').textContent='Разобрать';$('toggleLabels').textContent='Показать подписи';select(null);$('partName').textContent='Выберите деталь';$('partInfo').textContent='Нажмите на часть модели. Мышью вращайте, колесом приближайте.';fit()};
+
+const used=[],clip=new THREE.Vector3();
+function updateLabels(){
+ const width=stage.clientWidth,height=stage.clientHeight;used.length=0;
+ scene.updateMatrixWorld(true);
+ for(const {group,tag,line} of tags){
+  tag.style.display='none';line.style.display='none';if(!labelsOn)continue;
+  const p=group.localToWorld(group.userData.model.anchor.clone());clip.copy(p).project(camera);
+  if(clip.z<0||clip.z>1||Math.abs(clip.x)>1||Math.abs(clip.y)>1)continue;
+  const toward=p.clone().sub(camera.position),distance=toward.length();
+  raycaster.set(camera.position,toward.normalize());
+  const blocker=raycaster.intersectObjects(parts,true).find(h=>meshToPart.has(h.object)&&meshToPart.get(h.object)!==group);
+  if(blocker&&blocker.distance<distance-.08)continue;
+  const x=(clip.x+1)*width/2,y=(1-clip.y)*height/2;
+  tag.style.display='block';tag.style.visibility='hidden';const tw=tag.offsetWidth,th=tag.offsetHeight;
+  const positions=[[x-tw/2,y-th-13],[x+12,y-th/2],[x-tw-12,y-th/2],[x-tw/2,y+12]];
+  const ok=positions.find(([px,py])=>px>4&&py>4&&px+tw<width-4&&py+th<height-4&&used.every(([ax,ay,aw,ah])=>px+tw+5<ax||ax+aw+5<px||py+th+5<ay||ay+ah+5<py));
+  if(!ok){tag.style.display='none';continue}
+  tag.style.left=ok[0]+'px';tag.style.top=ok[1]+'px';tag.style.visibility='visible';
+  used.push([ok[0],ok[1],tw,th]);line.style.display='block';
+  line.setAttribute('x1',x);line.setAttribute('y1',y);line.setAttribute('x2',ok[0]+tw/2);line.setAttribute('y2',ok[1]+th/2);
+ }
+}
+let clock=0;
+function frame(t){
+ requestAnimationFrame(frame);const dt=Math.min(.05,(t-clock)/1000||0);clock=t;
+ for(const group of parts){const d=group.userData.model,target=d.base.clone().addScaledVector(d.explode,disassembled?1:0);group.position.lerp(target,Math.min(1,dt*9))}
+ if(step>=0&&typeof MODEL.animateStage==='function')MODEL.animateStage({time:t/1000,step,parts,THREE});
+ if(step>=0&&flowMarkers[step])flowMarkers[step].marker.position.copy(flowMarkers[step].curve.getPointAt((t*.00035)%1));
+ orbit.update();updateLabels();renderer.render(scene,camera);
+}
+requestAnimationFrame(frame);
+
+if(advancedView){
+ const switcher=document.createElement('div');switcher.className='advanced-view-switch';switcher.innerHTML="<button type=\"button\" id=\"advanced-3d-button\" aria-pressed=\"true\">Интерактивная 3D-модель</button><button type=\"button\" id=\"advanced-paper-button\" aria-pressed=\"false\">Реалистичный вид</button>";
+ $('status').after(switcher);
+ const paper=document.createElement('figure');paper.className='advanced-paper-view';paper.innerHTML="<img src=\"paper-arch-realistic.png\" width=\"1448\" height=\"1086\" alt=\"Реалистичный вид бумажного моста. Верхние поперечины и диагональные связи. Две арочные боковые фермы. Лист настила с продольными кромками. Отдельные V-образные рёбра под настилом. Декоративные боковые полосы. Две опоры с накладками и основание.\"><figcaption>Детали перечислены сверху вниз.<ul class=\"advanced-parts-key\"><li>Верхние поперечины и диагональные связи</li><li>Две арочные боковые фермы</li><li>Лист настила с продольными кромками</li><li>Отдельные V-образные рёбра под настилом</li><li>Декоративные боковые полосы</li><li>Две опоры с накладками и основание</li></ul></figcaption>";stage.before(paper);
+ const mode3d=$('advanced-3d-button'),modePaper=$('advanced-paper-button'),main=stage.closest('main');
+ function selectView(showPaper){
+  main.classList.toggle('advanced-paper-mode',showPaper);paper.hidden=!showPaper;
+  mode3d.setAttribute('aria-pressed',String(!showPaper));modePaper.setAttribute('aria-pressed',String(showPaper));
+  if(!showPaper)resize();
+ }
+ mode3d.addEventListener('click',()=>selectView(false));modePaper.addEventListener('click',()=>selectView(true));
+ selectView(new URLSearchParams(location.search).get('view')==='paper');
+}
+</script>
+</body>
+</html>

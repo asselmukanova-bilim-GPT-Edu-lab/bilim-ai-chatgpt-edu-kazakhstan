@@ -20,6 +20,20 @@ export const presentations = [
     source: `${seminarSite}/chatgpt-edu-kazakh-lanq-seminar/`,
     originalLanguage: 'kk',
     count: 16
+  },
+  {
+    id: 'assessment',
+    title: { ru: 'Оценивание в 5–11 классах', kk: '5–11-сыныптарда бағалау' },
+    source: 'presentations/assessment-5-11/secondary-5-11-kk.html#slide-1',
+    originalLanguage: 'kk',
+    count: 19
+  },
+  {
+    id: 'interactive',
+    title: { ru: 'ChatGPT Edu — интерактивные материалы', kk: 'ChatGPT Edu — интерактивті материалдар' },
+    source: 'presentations/interactive-materials/index.html#slide-1',
+    languageQuery: true,
+    count: 34
   }
 ];
 
@@ -116,7 +130,8 @@ function buildCard(deck, deckIndex) {
     status.hidden = stageState === 'ready';
     image.hidden = stageState !== 'ready';
     open.textContent = labels.open;
-    const destination = new URL(deck.source);
+    const destination = new URL(deck.source, document.baseURI);
+    if (deck.languageQuery) destination.searchParams.set('lang', lang);
     if (shownSlide?.hash) destination.hash = shownSlide.hash;
     open.href = destination.href;
   }

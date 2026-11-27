@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3D модельдер зертханасы</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:#101923;color:#f1f5f8}
+main{max-width:1200px;margin:auto;padding:16px}h1{font-size:clamp(1.5rem,3vw,2.2rem);margin:0 0 7px}
+p{margin:0;color:#c6d5de;line-height:1.5}.subtitle{max-width:900px}.badge{display:inline-block;font-size:.8rem;margin-top:12px;border:1px solid #668491;border-radius:100px;padding:7px 10px}
+#stage{position:relative;min-height:330px;height:min(68vh,690px);margin:16px 0 12px;border:1px solid #365162;border-radius:16px;overflow:hidden;background:radial-gradient(circle at 48% 38%,#263d4b,#111c28 75%)}
+#stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}#stage canvas:active{cursor:grabbing}
+#labels{position:absolute;inset:0;pointer-events:none}#lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.tag{position:absolute;z-index:1;display:none;white-space:nowrap;padding:5px 8px;border:1px solid #b3d1dc;border-radius:7px;background:#15293de9;color:#fff;font-size:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}button{background:#263b4a;border:1px solid #587082;border-radius:9px;color:#fff;padding:10px 13px;font:inherit;cursor:pointer}button:hover,button[aria-pressed="true"]{background:#39708a}
+.detail{margin-top:12px;border:1px solid #365162;background:#1c2b39;border-radius:12px;padding:15px;min-height:84px}.detail strong{display:block;margin-bottom:6px}
+footer{color:#afc1cc;font-size:.86rem;margin:12px 0}
+@media(max-width:600px){main{padding:10px}#stage{height:58vh;min-height:300px}.tag{font-size:10px;padding:3px 5px}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
+<style id="sites-model-style">body{background:#fff;color:#29272e;color-scheme:light}main h1{color:#754aff}main>p,main footer{color:#756d83}main .badge{border-color:#d6c6ed;color:#67517f;background:#f9f6ff}main #stage{background:radial-gradient(circle at 48% 38%,#faf7ff,#e8def8);border-color:#dcd0ef}main button{background:#fff;border-color:#d6c5ef;color:#63418e}main button:hover,main button[aria-pressed="true"]{background:#ede4ff;color:#5c2ab5}main .detail{background:#f9f6ff;border-color:#ded2ef;color:#29272e}main .detail p{color:#5c506e}.learner-workspace .learner-controls{background:#faf7ff;border-color:#ddcff1;color:#29272e}.learner-workspace .learner-controls h2,.learner-workspace .learner-controls h3{color:#754aff}.learner-workspace .learner-controls p{color:#53465f}.learner-workspace .learner-controls input,.learner-workspace .learner-controls select,.learner-workspace .learner-controls textarea{background:#fff;color:#29272e;border-color:#cfc0e7}.learner-workspace .learner-controls .lab-status{background:#f0e8ff;border-color:#754aff;color:#493264}.learner-workspace .learner-controls .lab-note{color:#806026!important}.learner-workspace .learner-controls td,.learner-workspace .learner-controls th{border-color:#dfd4ee}.learner-workspace .learner-controls th{color:#754aff}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #ffbb00;outline-offset:3px}</style></head>
+<body>
+<main>
+ <h1 id="title"></h1><p class="subtitle" id="explanation"></p><span class="badge" id="status"></span>
+ <div id="stage" aria-label="Интерактивті 3D модель: айналдыру үшін сүйреңіз, бөлікті таңдау үшін басыңыз"><div id="labels"><svg id="lines" aria-hidden="true"></svg></div></div>
+ <div class="actions"><button id="explode" aria-pressed="false">Бөлшектеу</button><button id="toggleLabels" aria-pressed="false">Атауларды көрсету</button><button id="works">Қалай жұмыс істейді?</button><button id="reset">Бастапқы көрініс</button></div>
+ <section class="detail" aria-live="polite"><strong id="partName">Бөлікті таңдаңыз</strong><p id="partInfo">Модельдің бір бөлігін басыңыз. Тінтуірмен сүйреп айналдырыңыз, дөңгелегімен жақындатыңыз.</p></section>
+ <footer id="footnote"></footer>
+</main>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+const MODEL = {
+title:"Физика · қағаз көпірдің деформациясы",
+explanation:"7.2.2.3 оқу мақсаты: серпімді және пластикалық деформацияларды ажырату. Модельдегі иілу мен пішіннің қалпына келуін көру үшін «Қалай жұмыс істейді?» түймесін басыңыз.",
+status:"Оқу моделі · өлшемдері шамамен берілген",
+footnote:"Оқу макетіндегі пішін, қалыңдық және өлшемдер шамамен берілген. Шартты сандар арнайы белгіленген. Көру үшін интернет қажет: Three.js сыртқы серверден жүктеледі. Айналдыру үшін сүйреңіз, масштабты тінтуір дөңгелегімен өзгертіңіз.",
+
+build({THREE,addPart}) {
+ const focus="s";
+ const ivory=new THREE.MeshStandardMaterial({color:0xeee8d9,roughness:.94,side:THREE.DoubleSide});
+ const metal=new THREE.MeshStandardMaterial({color:0x929ca4,metalness:.8,roughness:.32});
+ const dark=new THREE.MeshStandardMaterial({color:0x22384a,roughness:.7});
+ const teal=new THREE.MeshStandardMaterial({color:0x48bea9,roughness:.5});
+ const amber=new THREE.MeshStandardMaterial({color:0xf0b960,roughness:.55});
+ function woodTexture(){const c=document.createElement('canvas');c.width=256;c.height=256;const ctx=c.getContext('2d');ctx.fillStyle='#b68b5c';ctx.fillRect(0,0,256,256);for(let i=0;i<85;i++){ctx.strokeStyle=i%3?'#987348':'#cba678';ctx.lineWidth=i%4?.7:1.5;ctx.beginPath();for(let x=0;x<=256;x+=8){const y=i*3+Math.sin(x*.025+i)*2.4; x?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke()}const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t}
+ const wood=new THREE.MeshStandardMaterial({map:woodTexture(),roughness:.76});
+ function block(w,h,d,mat){const x=-w/2,y=-h/2,r=Math.min(.06,w/8,h/8);const s=new THREE.Shape();s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);const g=new THREE.ExtrudeGeometry(s,{depth:d,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.015,bevelThickness:.015});g.translate(0,0,-d/2);return new THREE.Mesh(g,mat)}
+ function line(points,color=0x8d9bad){return new THREE.Line(new THREE.BufferGeometry().setFromPoints(points.map(p=>new THREE.Vector3(...p))),new THREE.LineBasicMaterial({color}))}
+ function labelPlane(lines,w,h){const c=document.createElement('canvas');c.width=1024;c.height=640;const ctx=c.getContext('2d');ctx.fillStyle='#f2f0e7';ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle='#153546';ctx.textBaseline='middle';ctx.font='bold 38px Arial';lines.forEach((s,i)=>{ctx.font=i===0?'bold 42px Arial':'32px Arial';ctx.fillStyle=i===0?'#117b70':'#153546';ctx.fillText(s,35,65+i*75)});const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshStandardMaterial({map:t,roughness:1,side:THREE.DoubleSide}))}
+ const builtParts=[];function assembly(name,info,group,explode,anchor){addPart({name,info,group,explode,anchor});builtParts.push(group);return group}
+ const base=new THREE.Group();const tabletop=block(7.9,.16,4.7,wood);tabletop.position.y=-.13;base.add(tabletop);assembly("Жұмыс үстелі","Модельдер тегіс бетте салыстырылады. Сынақ шарттары бірдей болуы керек.",base,[0,-.5,0],[0,0,2.2]);
+ [-1,1].forEach((sign,i)=>{const group=new THREE.Group();group.position.set(sign*2.25,.5,0);group.add(block(.65,1,2.8,wood));const pad=block(.7,.04,2.9,dark);pad.position.y=.52;group.add(pad);for(let k=0;k<4;k++){const grain=line([[-.33,-.35+k*.22,1.411],[.33,-.31+k*.22,1.411]],0x8c633b);group.add(grain)}assembly(i?"Оң жақ тірек":"Сол жақ тірек","Екі бірдей тірек көпірдің аралығын белгілейді. Оқу тапсырмасында олардың ішкі жиектерінің арасы сызғышпен 15 см етіп қойылады.",group,[sign*.65,0,0],[0,.6,0])});
+ function paperMesh(corrugated,sag=0,folds=8){const vertices=[],indices=[],nx=72,nz=32;for(let ix=0;ix<=nx;ix++){const x=-2.7+5.4*ix/nx;for(let iz=0;iz<=nz;iz++){const z=-1.25+2.5*iz/nz;const fold=corrugated?(Math.abs(((iz/nz*folds)%1)-.5)*2-.5)*.28:0;const bend=Math.max(0,1-(x/2.35)**2);vertices.push(x,1.115+fold-sag*bend,z)}}for(let ix=0;ix<nx;ix++)for(let iz=0;iz<nz;iz++){let a=ix*(nz+1)+iz,b=a+nz+1;indices.push(a,b,a+1,a+1,b,b+1)}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();const mesh=new THREE.Mesh(g,ivory.clone());mesh.userData.original=Float32Array.from(vertices);return mesh}
+ const paper=new THREE.Group();const sheet=paperMesh(focus!=='s');paper.add(sheet);const edge=new THREE.LineSegments(new THREE.EdgesGeometry(sheet.geometry,28),new THREE.LineBasicMaterial({color:0xb8b0a0,transparent:true,opacity:.7}));paper.add(edge);paper.userData.sheet=sheet;paper.userData.edge=edge;assembly("Көпірдің қағаз бөлігі","Жұқа парақ пен бойлық бүктемелер жүк көтеретін бөлікті құрайды. Пішіні мен қалыңдығы үлгі ретінде берілген. Беріктік есептелмейді.",paper,[0,1.1,0],[0,1.35,-.5]);
+ const load=new THREE.Group();load.position.set(0,1.21,0);const tray=block(.85,.065,.85,dark);load.add(tray);for(let i=0;i<3;i++){const cylinder=new THREE.Mesh(new THREE.CylinderGeometry(.26,.26,.12,48),metal);cylinder.position.y=.10+i*.13;load.add(cylinder);const ring=new THREE.Mesh(new THREE.TorusGeometry(.21,.008,8,48),dark);ring.rotation.x=Math.PI/2;ring.position.y=.162+i*.13;load.add(ring)}load.children.forEach(child=>child.userData.restY=child.position.y);load.userData.startY=load.position.y;assembly("Бірдей жүктер жиыны","Жүктер біртіндеп қосылады. Бұл — көрнекі бейне, одан массаны анықтау мүмкін емес. Сынақты үстел үстінде жүргізіп, деформация анық байқалғанда тоқтатыңыз.",load,[0,1.8,0],[0,.55,0]);
+ const ruler=new THREE.Group();ruler.position.set(0,.15,1.82);ruler.add(block(5.2,.055,.33,new THREE.MeshStandardMaterial({color:0xc8b486,roughness:.7})));for(let i=0;i<=30;i++){let x=-2.25+i*.15;ruler.add(line([[x,.038,-.14],[x,.038,i%2===0?.09:-.01]],0x332b23))}const rulerText=labelPlane(["Тіректер арасы — 15 см","Шарттар бірдей болсын"],3.9,.52);rulerText.rotation.x=-Math.PI/2;rulerText.position.set(0,.045,.5);ruler.add(rulerText);assembly("Өлшеуіш сызғыш","Тіректер арасының және жүк орнының бірдей екенін тексеруге арналған. 3D модельдің өлшемдері шартты. Сызғыш нақты тәжірибеде қажет.",ruler,[0,0,1],[0,.06,0]);
+ if(focus==='e'){
+   const sketches=new THREE.Group();sketches.position.set(0,2.4,-1.75);const plate=labelPlane(["Екі нобай, ортақ шектеу","А: тегіс қағаз","Б: бойлық бүктемелер","Таңдау → сынақ → жетілдіру"],4.5,2.4);sketches.add(plate);assembly("Құрылым нобайлары","Алдымен нұсқаларды тапсырманың талаптарына сай салыстырыңыз. Сынақтан кейін бір шаманы өзгертіп, өлшеуді қайталаңыз.",sketches,[0,.6,-.8],[0,1.3,0]);
+ }
+ if(focus==='m'){
+   const chart=new THREE.Group();chart.position.set(0,0,-1.55);
+   const board=labelPlane(["ШАРТТЫ ДЕРЕКТЕР","Тегіс: 2, 3, 2 жүк","Бүктелген: 5, 6, 5 жүк","Орташа: 2,33 және 5,33","Өз деректеріңізді тәжірибеде алыңыз"],5.2,2.9);board.position.set(0,2.4,-.6);chart.add(board);
+   [2.33,5.33].forEach((v,i)=>{const h=v*.20;const bar=block(.55,h,.55,i?teal:amber);bar.position.set(i?.6:-.6,h/2,.12);chart.add(bar)});
+   assembly("Нәтижелер диаграммасы","Бұл — оқу үшін берілген сандар. Алдымен деректерді жинап, орташа мәнін есептеңіз, содан кейін айырмашылықты түсіндіріңіз. Баған биіктіктері 2,33 және 5,33 орташа мәндеріне сай.",chart,[0,0,-1],[0,3.95,-.6]);
+ }
+ if(focus==='t'){
+   const data=new THREE.Group();data.position.set(0,2.3,-1.8);const before=2,after=5,delta=after-before;
+   const screen=labelPlane(["ОҚУ КЕСТЕСІ","B2: дейін = "+before+"   C2: кейін = "+after,'D2: =C2-B2 → '+delta,"Тексеріңіз: 5 − 2 = 3","Сандарды тәжірибе деректерімен ауыстырыңыз"],5.4,2.9);data.add(screen);
+   const frame=block(5.65,3.12,.10,dark);frame.position.z=-.09;data.add(frame);
+   for(let x=-2.45;x<2.5;x+=.6){data.add(line([[x,-1.43,.02],[x,1.43,.02]],0xc5d0ca))}
+   assembly("Кесте және формула","Электрондық кесте формуласының мысалы: D2=C2−B2. 2 мен 5 — шартты сандар. 3 — есептелген нәтиже. Күштің өзгерісін анықтау үшін жүк санымен бірге әр жүктің массасын білу қажет.",data,[0,.6,-1],[0,1.7,0]);
+ }
+ // Object-specific learner workspace; the viewer keeps its existing controls.
+ const stageNode=document.getElementById('stage');
+ const workspace=document.createElement('div');workspace.className='learner-workspace';
+ stageNode.parentNode.insertBefore(workspace,stageNode);
+ const ui=document.createElement('section');ui.className='learner-controls';ui.setAttribute('aria-label',"Оқушының әрекеттері");
+ workspace.append(stageNode,ui);
+ const style=document.createElement('style');style.textContent=`
+ .learner-workspace{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr);gap:14px;margin-top:14px}.learner-workspace #stage{margin:0;height:650px;min-height:400px}.learner-controls{max-height:650px;overflow:auto;padding:18px;border:1px solid #476578;border-radius:14px;background:#182a38}.learner-controls h2{font-size:22px;margin:0 0 12px;color:#65dfc5}.learner-controls h3{font-size:18px;margin:17px 0 9px}.learner-controls p{font-size:15px;margin:10px 0}.learner-controls label{display:block;margin:12px 0;font-size:15px}.learner-controls input,.learner-controls select,.learner-controls textarea{width:100%;box-sizing:border-box;color:#f3f6fa;background:#101c26;border:1px solid #7b96a5;border-radius:7px;padding:9px;font:inherit;margin-top:5px}.learner-controls textarea{min-height:70px;resize:vertical}.learner-controls button{font-size:14px;margin:4px 4px 4px 0}.learner-controls button:disabled{opacity:.4;cursor:default}.learner-controls table{width:100%;border-collapse:collapse;font-size:13px}.learner-controls td,.learner-controls th{text-align:left;border-bottom:1px solid #456071;padding:7px 4px}.lab-status{padding:10px;border-left:3px solid #65dfc5;background:#203a49;min-height:40px;white-space:pre-wrap}.lab-note{font-size:13px!important;color:#eac78a!important}.lab-sketch{display:block;width:100%;height:100px;background:#faf7eb;border-radius:7px;touch-action:none;cursor:crosshair}.learner-controls .paired{display:grid;grid-template-columns:1fr 1fr;gap:10px}.learner-controls .mono{font-family:monospace}@media(max-width:850px){.learner-workspace{grid-template-columns:1fr}.learner-workspace #stage{height:450px;min-height:330px}.learner-controls{max-height:none}}`;
+ document.head.append(style);
+ const $lab=id=>ui.querySelector('#'+id);
+ const safe=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const findPart=name=>builtParts.find(p=>p.userData.model.name===name);
+ load.children.forEach(child=>child.userData.restY=child.position.y);
+ const originalTray=load.children[0];
+ // Six identical visual weights, each with its own rim. Count is a teaching unit, not grams.
+ while(load.children.length<13){const i=(load.children.length-1)/2;const w=new THREE.Mesh(new THREE.CylinderGeometry(.26,.26,.12,48),metal);w.position.y=.10+i*.13;w.userData.restY=w.position.y;load.add(w);const ring=new THREE.Mesh(new THREE.TorusGeometry(.21,.008,8,48),dark);ring.rotation.x=Math.PI/2;ring.position.y=.162+i*.13;ring.userData.restY=ring.position.y;load.add(ring)}
+ let currentSag=0,animation=0;
+ function deform(sag){const mesh=paper.userData.sheet,original=mesh.userData.original,positions=mesh.geometry.attributes.position;for(let i=0;i<positions.count;i++){const x=original[i*3];positions.setY(i,original[i*3+1]-sag*Math.max(0,1-(x/2.35)**2))}positions.needsUpdate=true;mesh.geometry.computeVertexNormals();paper.userData.edge.geometry.dispose();paper.userData.edge.geometry=new THREE.EdgesGeometry(mesh.geometry,28);paper.userData.edge.visible=true;load.children.forEach(child=>child.position.y=child.userData.restY-sag);currentSag=sag;}
+ function setSag(target){cancelAnimationFrame(animation);const from=currentSag,start=performance.now();function tick(now){const t=Math.min(1,(now-start)/650);deform(from+(target-from)*(t*t*(3-2*t)));if(t<1)animation=requestAnimationFrame(tick)}animation=requestAnimationFrame(tick)}
+ function setLoad(count){load.children.forEach((child,i)=>child.visible=i===0?count>0:Math.floor((i-1)/2)<count)}
+ function setShape(shape){const fresh=paperMesh(shape!=='flat',0,shape==='fold4'?4:8);paper.userData.sheet.geometry.dispose();paper.userData.sheet.geometry=fresh.geometry;paper.userData.sheet.userData.original=fresh.userData.original;deform(currentSag)}
+ function updateBoard(name,lines){const part=findPart(name);if(!part)return;const display=part.children.find(m=>m.isMesh&&m.geometry.type==='PlaneGeometry');if(!display)return;const next=labelPlane(lines,1,1);display.material.map?.dispose();display.material.dispose();display.material=next.material;next.geometry.dispose()}
+ function exportResult(data){const blob=new Blob([JSON.stringify({subject:focus,title:MODEL.title,notice:"Оқу жұмысының нәтижесі. Виртуалды деректер қағазбен жасалған нақты өлшемдердің орнына қолданылмайды.",...data},null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='STEM-'+focus+'-result.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+ const intro="<h2>Оқушының тапсырмаларын орындаңыз</h2><p class=\"lab-note\">Бұл — виртуалды оқу қондырғысы. Ол қағаздың нақты беріктігін есептемейді. Терезені жаппас бұрын «Нәтижені жүктеп алу» түймесімен жазбаларды сақтаңыз.</p>";
+ if(focus==='s'){
+  ui.innerHTML=intro+`<h3>1. Оқу сценарийін таңдаңыз</h3><label>Жүкті алғаннан кейінгі пішін<select id="s-mode"><option value="elastic">Серпімді деформация</option><option value="residual">Қалдық деформация</option></select></label><p>Сценарий белгілерді салыстыру үшін алдын ала берілген. Қағаздың серпімділік шегі бұл модельде өлшенбейді.</p><h3>2. Жүкті қойып, қайта алыңыз</h3><label>Бірдей жүк саны: <output id="s-count">0</output><input id="s-load" type="range" min="0" max="3" step="1" value="0"></label><button id="s-small" type="button">1 жүк қою</button><button id="s-remove" type="button" disabled>Жүкті алу</button><p id="s-status" class="lab-status" aria-live="polite">Бастапқы пішін. Жүкті қойыңыз.</p><h3>3. Бақылауды жазыңыз</h3><label>Жүкті алғаннан кейін пішін қалай өзгерді?<textarea id="s-observation" placeholder="Пішін қалпына келді ме, әлде иілу сақталды ма? Оны қалай байқадыңыз?"></textarea></label><button id="s-record" type="button" disabled>Бақылауды жазу</button><table><thead><tr><th>Сценарий</th><th>Бақылау</th></tr></thead><tbody id="s-rows"></tbody></table><button id="s-reset" type="button">Жаңа тәжірибе</button><button id="s-export" type="button">Нәтижені жүктеп алу</button>`;
+  let applied=false,removed=false,hadResidual=false,rows=[];
+  function change(count){$lab('s-count').textContent=count;setLoad(count);const mode=$lab('s-mode').value;if(count>0){applied=true;removed=false;hadResidual=mode==='residual';setSag(.07*count);$lab('s-status').textContent="Жүк қойылды. Иілу байқалады. Енді жүктерді алыңыз."}else if(applied){removed=true;setSag(hadResidual?.10:0);$lab('s-status').textContent=hadResidual?"Жүк алынғаннан кейін шартты иілу сақталады. Қайтымсыз өзгерістің белгісін жазыңыз.":"Жүк алынғаннан кейін пішін қалпына келеді. Серпімді деформацияның белгісін жазыңыз."}else setSag(0);$lab('s-remove').disabled=count===0;$lab('s-record').disabled=!removed;}
+  function reset(){applied=false;removed=false;hadResidual=false;$lab('s-load').value=0;$lab('s-count').textContent=0;setLoad(0);setSag(0);$lab('s-status').textContent="Бастапқы пішін. Жүкті қойыңыз.";$lab('s-record').disabled=true;$lab('s-remove').disabled=true;$lab('s-observation').value='';}
+  $lab('s-load').addEventListener('input',()=>change(Number($lab('s-load').value)));
+  $lab('s-small').onclick=()=>{$lab('s-load').value=1;change(1)};
+  $lab('s-remove').onclick=()=>{$lab('s-load').value=0;change(0)};
+  $lab('s-mode').onchange=reset;$lab('s-reset').onclick=reset;
+  $lab('s-record').onclick=()=>{const note=$lab('s-observation').value.trim();if(!note){$lab('s-status').textContent="Алдымен өз бақылауыңызды жазыңыз.";return}rows.push({scenario:$lab('s-mode').selectedOptions[0].text,observation:note,source:"Алдын ала берілген виртуалды сценарий"});$lab('s-rows').innerHTML=rows.map(r=>'<tr><td>'+safe(r.scenario)+'</td><td>'+safe(r.observation)+'</td></tr>').join('');$lab('s-record').disabled=true};
+  $lab('s-export').onclick=()=>exportResult({observations:rows});document.getElementById('reset').addEventListener('click',reset);setLoad(0);
+ }
+ if(focus==='m'){
+  ui.innerHTML=intro+`<h3>1. Сынақтарды бірдей жағдайда өткізіңіз</h3><p>Жаттығуға арналған шартты деректер: тегіс қағаз — 2, 3, 2 жүк, бүктелген қағаз — 5, 6, 5 жүк. Тіректер арасы мен жүк түрі бірдей деп алынады.</p><label>Модель<select id="m-shape"><option value="flat">Тегіс қағаз</option><option value="fold8">Бүктелген қағаз</option></select></label><button id="m-trial" type="button">Виртуалды сынақ өткізу</button><p id="m-status" class="lab-status" aria-live="polite">Модельді таңдаңыз. Әрқайсысы үшін үш сынақ бар.</p><h3>2. Өз өлшемдеріңізді қосыңыз</h3><label>Анық иілуге дейінгі жүк саны<input id="m-real" type="number" min="0" step="1" placeholder="Нақты тәжірибе нәтижесін енгізіңіз"></label><button id="m-add" type="button">Нақты өлшемді қосу</button><label>Көрсетілетін деректер<select id="m-source"><option value="virtual">Виртуалды</option><option value="real">Нақты</option></select></label><table><thead><tr><th>Модель</th><th>Сынақ</th><th>Жүктер</th></tr></thead><tbody id="m-rows"></tbody></table><p id="m-summary"></p><h3>3. Нәтижені түсіндіріңіз</h3><label>Кесте бойынша қорытынды<textarea id="m-conclusion" placeholder="Қай нұсқа жақсы нәтиже көрсетті? Оны қандай деректер растайды?"></textarea></label><button id="m-export" type="button">Нәтижені жүктеп алу</button><button id="m-clear" type="button">Деректерді тазарту</button>`;
+  let rows=[],counts={flat:0,fold8:0};const samples={flat:[2,3,2],fold8:[5,6,5]};
+  const name=shape=>shape==='flat'?"Тегіс":"Бүктелген қағаз";
+  function render(){const src=$lab('m-source').value,shown=rows.filter(r=>r.source===src);$lab('m-rows').innerHTML=shown.map(r=>'<tr><td>'+name(r.shape)+'</td><td>'+r.trial+'</td><td>'+r.count+'</td></tr>').join('');let means={};for(const shape of ['flat','fold8']){const list=shown.filter(r=>r.shape===shape);means[shape]=list.length?list.reduce((a,r)=>a+r.count,0)/list.length:null;}const format=n=>n===null?"дерек жоқ":n.toFixed(2).replace('.',',');$lab('m-summary').textContent="Орташа мән: тегіс — "+format(means.flat)+"; бүктелген — "+format(means.fold8)+". Дереккөзі: "+(src==='virtual'?"виртуалды деректер":"нақты өлшемдер")+'.';const chart=findPart("Нәтижелер диаграммасы");chart.children.filter(m=>m.isMesh&&m.geometry.type==='ExtrudeGeometry').forEach((bar,i)=>{const value=i?means.fold8:means.flat;bar.visible=value!==null&&value>0;if(bar.visible){const h=Math.max(.02,value*.2);const baseHeight=i?5.33*.2:2.33*.2;bar.scale.y=h/baseHeight;bar.position.y=h/2}});updateBoard("Нәтижелер диаграммасы",[src==='virtual'?"ВИРТУАЛДЫ ДЕРЕКТЕР":"НАҚТЫ ӨЛШЕМДЕР","Тегіс: орташа мәні "+format(means.flat),"Бүктелген: "+format(means.fold8),"Жазба саны: "+shown.length,"Сынақ шарттарын салыстырыңыз"]);$lab('m-trial').disabled=counts[$lab('m-shape').value]>=3;}
+  $lab('m-shape').onchange=()=>{setShape($lab('m-shape').value);setLoad(0);setSag(0);render()};
+  $lab('m-source').onchange=render;
+  $lab('m-trial').onclick=()=>{const shape=$lab('m-shape').value,i=counts[shape];if(i>=3)return;const count=samples[shape][i];counts[shape]++;rows.push({shape,source:'virtual',trial:counts[shape],count});$lab('m-source').value='virtual';setShape(shape);setLoad(count);setSag(.16);$lab('m-status').textContent="Шартты сынақ "+counts[shape]+': '+count+" жүк. Бұл мән оқу мысалынан алынған. Беріктік бойынша есептелген жоқ.";render()};
+  $lab('m-add').onclick=()=>{const raw=$lab('m-real').value,n=Number(raw);if(raw===''||!Number.isInteger(n)||n<0){$lab('m-status').textContent="Жүк санын нөл немесе оң бүтін сан түрінде енгізіңіз.";return}const shape=$lab('m-shape').value;rows.push({shape,source:'real',trial:rows.filter(r=>r.shape===shape&&r.source==='real').length+1,count:n});$lab('m-source').value='real';render()};
+  $lab('m-clear').onclick=()=>{rows=[];counts={flat:0,fold8:0};setLoad(0);setSag(0);render()};
+  $lab('m-export').onclick=()=>exportResult({measurements:rows,conclusion:$lab('m-conclusion').value});setShape('flat');setLoad(0);render();
+ }
+ if(focus==='t'){
+  ui.innerHTML=intro+`<h3>1. Ұяшықтарды толтырыңыз</h3><p>Бастапқы сандар шартты түрде берілген. Оларды өз тәжірибеңіздің нәтижелерімен алмастыра аласыз.</p><div class="paired"><label>B2 · жетілдіруге дейін<input id="t-before" type="number" min="0" step="1" value="2"></label><label>C2 · жетілдіруден кейін<input id="t-after" type="number" min="0" step="1" value="5"></label></div><h3>2. D2 ұяшығына формула енгізіңіз</h3><label>Айырманы есептеу формуласы<input id="t-formula" class="mono" placeholder="= таңбасынан бастаңыз" autocomplete="off"></label><button id="t-compute" type="button">Формуламен есептеу</button><button id="t-hint" type="button">Көмек</button><p id="t-result" class="lab-status" aria-live="polite">Нәтиженің кейінгі мәнінен бастапқы мәнін азайтатын формуланы енгізіңіз.</p><h3>3. Қолмен тексеріңіз</h3><label>Қолмен есептеген айырмам<input id="t-manual" type="number" step="1"></label><button id="t-check" type="button">Нәтижені салыстыру</button><p id="t-check-result" aria-live="polite"></p><label>Айырманың таңбасын түсіндіріңіз<textarea id="t-explain" placeholder="Оң, нөлдік немесе теріс айырма нені білдіреді?"></textarea></label><button id="t-export" type="button">Нәтижені жүктеп алу</button>`;
+  let result=null,checked=false;
+  function inputs(){const a=$lab('t-before').value,b=$lab('t-after').value;if(a===''||b==='')return null;const before=Number(a),after=Number(b);return Number.isInteger(before)&&Number.isInteger(after)&&before>=0&&after>=0?{before,after}:null}
+  function invalidate(){result=null;checked=false;$lab('t-result').textContent="Деректер өзгерді. Формуламен қайта есептеңіз.";$lab('t-check-result').textContent='';const d=inputs();if(d)updateBoard("Кесте және формула",["ОҚУШЫНЫҢ ДЕРЕКТЕРІ",'B2='+d.before+'   C2='+d.after,"D2: формула енгізіңіз","Кейінгі мән − бастапқы мән","Қолмен тексеріңіз"]);}
+  ['t-before','t-after','t-formula'].forEach(id=>$lab(id).addEventListener('input',invalidate));
+  $lab('t-hint').onclick=()=>{$lab('t-result').textContent="C2 мәнінен B2 мәнін азайтыңыз: =C2-B2. Формуланы өзіңіз енгізіңіз."};
+  $lab('t-compute').onclick=()=>{const d=inputs(),formula=$lab('t-formula').value.toUpperCase().replace(/\s/g,'');if(!d){$lab('t-result').textContent="Жүк саны нөл немесе оң бүтін сан болуы керек.";return}if(formula!=='=C2-B2'){result=null;$lab('t-result').textContent="Ұяшық мекенжайлары мен азайту ретін тексеріңіз. Бұл оқу өрісі C2 мен B2 ұяшықтарының айырмасын есептейді.";return}result=d.after-d.before;checked=false;$lab('t-result').textContent='D2 = '+result+". Енді айырманы өзіңіз қолмен есептеңіз.";setLoad(Math.min(6,d.after));updateBoard("Кесте және формула",["ОҚУШЫНЫҢ ДЕРЕКТЕРІ",'B2='+d.before+'   C2='+d.after,'D2: =C2-B2 → '+result,"Қолмен тексеріңіз","Айырма жүк санымен берілген"]);};
+  $lab('t-check').onclick=()=>{if(result===null){$lab('t-check-result').textContent="Алдымен формуламен нәтиже алыңыз.";return}const raw=$lab('t-manual').value;checked=raw!==''&&Number(raw)===result;$lab('t-check-result').textContent=checked?"Нәтижелер сәйкес келді. Айырманың таңбасын түсіндіріңіз.":"Нәтижелер сәйкес келмеді. Кейінгі мәннен бастапқы мәнді қайта азайтыңыз."};
+  $lab('t-export').onclick=()=>exportResult({cells:inputs(),formula:$lab('t-formula').value,result,manual:$lab('t-manual').value,checked,explanation:$lab('t-explain').value});updateBoard("Кесте және формула",["ОҚУШЫНЫҢ ДЕРЕКТЕРІ",'B2=2   C2=5',"D2: формула енгізіңіз","Кейінгі мән − бастапқы мән","Қолмен тексеріңіз"]);
+ }
+ if(focus==='e'){
+  ui.innerHTML=intro+`<h3>1. Екі нобай дайындаңыз</h3><p>Көпірдің көлденең пішінін саусақпен немесе тінтуірмен сызыңыз. Шектеулер: бір А4 парағы, тіректер арасы бірдей — 15 см. 3D пішін оқу үшін берілген және оның өлшемдері шамамен алынған.</p><div class="paired"><div><label>А нобайы<select id="e-a"><option value="flat">Тегіс</option><option value="fold4">4 бүктеме</option><option value="fold8">8 бүктеме</option></select></label><canvas id="e-sketch-a" class="lab-sketch" width="500" height="200" aria-label="А нобайын сызу"></canvas><button id="e-view-a" type="button">А нұсқасын 3D түрінде көрсету</button></div><div><label>Б нобайы<select id="e-b"><option value="fold4">4 бүктеме</option><option value="fold8">8 бүктеме</option><option value="flat">Тегіс</option></select></label><canvas id="e-sketch-b" class="lab-sketch" width="500" height="200" aria-label="Б нобайын сызу"></canvas><button id="e-view-b" type="button">Б нұсқасын 3D түрінде көрсету</button></div></div><button id="e-clear" type="button">Нобайларды тазарту</button><h3>2. Құрылымды таңдаңыз</h3><label>Менің таңдауым<select id="e-choice"><option value="a">А нобайы</option><option value="b">Б нобайы</option></select></label><label>Нұсқа шарттарға неліктен сай келеді?<textarea id="e-reason"></textarea></label><button id="e-select" type="button">Таңдауды тіркеу</button><h3>3. Жетілдіруді негіздеңіз</h3><label>Нені және неліктен өзгертесіз?<textarea id="e-improvement"></textarea></label><label>Жетілдіруден кейінгі пішін<select id="e-improved"><option value="fold8">8 бүктеме</option><option value="fold4">4 бүктеме</option><option value="flat">Тегіс</option></select></label><button id="e-preview" type="button">Жетілдірілген үлгіні көрсету</button><p>Нақты сынақ жүргізілсе, нәтижелерін жазыңыз:</p><div class="paired"><label>Дейін<input id="e-before" type="number" min="0" step="1"></label><label>Кейін<input id="e-after" type="number" min="0" step="1"></label></div><p id="e-status" class="lab-status" aria-live="polite">Екі нобай дайындаңыз. Құрылымның беріктігін сынақ арқылы тексеріңіз.</p><button id="e-save" type="button">Жобаны файлға сақтау</button>`;
+  let drawn={a:false,b:false},selected=null;
+  for(const key of ['a','b']){const canvas=$lab('e-sketch-'+key),ctx=canvas.getContext('2d');ctx.strokeStyle='#223e50';ctx.lineWidth=4;ctx.lineCap='round';let drawing=false;const pos=e=>{const r=canvas.getBoundingClientRect();return [(e.clientX-r.left)*canvas.width/r.width,(e.clientY-r.top)*canvas.height/r.height]};canvas.onpointerdown=e=>{drawing=true;canvas.setPointerCapture(e.pointerId);const [x,y]=pos(e);ctx.beginPath();ctx.moveTo(x,y)};canvas.onpointermove=e=>{if(!drawing)return;const [x,y]=pos(e);ctx.lineTo(x,y);ctx.stroke();drawn[key]=true;selected=null};canvas.onpointerup=canvas.onpointercancel=()=>drawing=false;$lab('e-view-'+key).onclick=()=>{setShape($lab('e-'+key).value);setLoad(0);setSag(0);$lab('e-status').textContent="Көрсетілген нобай: "+key.toUpperCase()+". 3D пішінді өз суретіңізбен салыстырыңыз."};$lab('e-'+key).onchange=()=>selected=null;}
+  $lab('e-clear').onclick=()=>{for(const k of ['a','b']){$lab('e-sketch-'+k).getContext('2d').clearRect(0,0,500,200);drawn[k]=false}selected=null;};
+  $lab('e-choice').onchange=()=>selected=null;$lab('e-reason').oninput=()=>selected=null;
+  $lab('e-select').onclick=()=>{const reason=$lab('e-reason').value.trim();if(!drawn.a||!drawn.b||reason.length<10){$lab('e-status').textContent="Екі нобай сызып, таңдауыңызды кемінде бір сөйлеммен түсіндіріңіз.";return}const key=$lab('e-choice').value;selected={sketch:key,shape:$lab('e-'+key).value,reason};setShape(selected.shape);setLoad(0);setSag(0);$lab('e-status').textContent="Таңдау тіркелді. Енді өзгерісті және оны тексеру тәсілін көрсетіңіз.";updateBoard("Құрылым нобайлары",["ОҚУШЫНЫҢ ТАҢДАУЫ","Нобай "+key.toUpperCase(),selected.shape==='flat'?"Тегіс құрылым":"Бүктемелері бар құрылым","Келесі қадам — жетілдіру"]);};
+  $lab('e-preview').onclick=()=>{if(!selected){$lab('e-status').textContent="Алдымен таңдауыңызды негіздеп, тіркеңіз.";return}setShape($lab('e-improved').value);setSag(0);setLoad(0);$lab('e-status').textContent="Өзгертілген пішін көрсетілді. Оның тиімділігін сынақпен тексеріңіз."};
+  $lab('e-save').onclick=()=>{if(!selected||$lab('e-improvement').value.trim().length<10){$lab('e-status').textContent="Таңдауды тіркеп, жетілдірудің негіздемесін жазыңыз.";return}const b=$lab('e-before').value,a=$lab('e-after').value;exportResult({sketchA:$lab('e-sketch-a').toDataURL(),sketchB:$lab('e-sketch-b').toDataURL(),selected,improvement:$lab('e-improvement').value,improvedShape:$lab('e-improved').value,measurements:{before:b===''?null:Number(b),after:a===''?null:Number(a),source:b!==''&&a!==''?"Оқушы енгізді":"Сынақ әлі жүргізілген жоқ"}});$lab('e-status').textContent="Жоба файлға сақталды. Беріктік туралы қорытындыны сынақ жүргізілгеннен кейін жасаңыз."};setShape('flat');setLoad(0);updateBoard("Құрылым нобайлары",["ОҚУШЫНЫҢ ЕКІ НОБАЙЫ","Панельде А мен Б нобайын сызыңыз","Талаптарға сай таңдаңыз","Жетілдіруді тәжірибемен тексеріңіз"]);
+ }
+
+},
+stages:[{"part": "Көпірдің қағаз бөлігі", "text": "Панельден оқу сценарийін таңдаңыз, жүкті қойып, қайта алыңыз. Бастапқы және кейінгі пішінді салыстырып, бақылауды жазыңыз. Иілу оқу үшін көрсетіледі. Ол беріктік есебіне негізделмеген."}, {"part": "Бірдей жүктер жиыны", "text": "Нақты тәжірибеде жүкті алып, пішіннің қалпына келуін тексереді. Сақталған иілу қайтымсыз деформацияны көрсетуі мүмкін. Модель шекті жүктемені анықтамайды."}, {"part": "Өлшеуіш сызғыш", "text": "Тіректер арасы, жүк орны мен массасы бірдей болғанда модельдерді салыстырыңыз. Бақылауыңызды жазыңыз. Серіппеге арналған Гук заңын бүкіл көпірге негізсіз қолданбаңыз."}]
+};
+const $ = id => document.getElementById(id);
+$('title').textContent = MODEL.title;
+$('explanation').textContent = MODEL.explanation || '';
+$('status').textContent = MODEL.status || "Оқу моделі · өлшемдері шамамен берілген";
+$('footnote').textContent = MODEL.footnote || "Оқу моделіндегі кейбір өлшемдер мен бөлшектер шамамен берілген.";
+document.title = MODEL.title + ' · 3D модельдер зертханасы';
+
+const stage=$('stage'),scene=new THREE.Scene(),objectRoot=new THREE.Group();scene.add(objectRoot);
+const camera=new THREE.PerspectiveCamera(42,1,.01,1000);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+stage.prepend(renderer.domElement);
+const orbit=new OrbitControls(camera,renderer.domElement);orbit.enableDamping=true;orbit.dampingFactor=.08;
+scene.add(new THREE.HemisphereLight(0xe1edf5,0x4c5c68,2.2));
+const key=new THREE.DirectionalLight(0xffffff,3);key.position.set(6,8,7);scene.add(key);
+const fill=new THREE.DirectionalLight(0x91bcd1,1.4);fill.position.set(-7,3,-5);scene.add(fill);
+
+const parts=[],meshToPart=new WeakMap(),tags=[];
+function addPart({name,info,group,explode=[0,0,0],anchor=null}){
+ if(!name||!group?.isGroup)throw new Error('Every named part needs a THREE.Group');
+ objectRoot.add(group);
+ const meshes=[];
+ group.traverse(node=>{if(node.isMesh){meshToPart.set(node,group);meshes.push(node)}});
+ if(!meshes.length)throw new Error('A selectable part needs visible geometry: '+name);
+ group.userData.model={name,info:info||'',base:group.position.clone(),explode:new THREE.Vector3(...explode),anchor:anchor?new THREE.Vector3(...anchor):null};
+ parts.push(group);
+ const tag=document.createElement('span');tag.className='tag';tag.textContent=name;$('labels').append(tag);
+ const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('stroke','#afcad7');line.setAttribute('stroke-width','1');$('lines').append(line);
+ tags.push({group,tag,line});return group;
+}
+// MODEL.build creates object-specific geometry and calls addPart for meaningful assemblies.
+MODEL.build({THREE,scene,objectRoot,addPart});
+if(!parts.length)throw new Error('The model has no selectable parts');
+if(!Array.isArray(MODEL.stages)||!MODEL.stages.length)throw new Error('How it works needs object-specific stages');
+for(const s of MODEL.stages)if(!parts.some(p=>p.userData.model.name===s.part)||!s.text)throw new Error('Invalid explanation stage: '+s.part);
+scene.updateMatrixWorld(true);
+for(const group of parts){
+ const d=group.userData.model;if(d.anchor)continue;
+ const b=new THREE.Box3().setFromObject(group),world=b.getCenter(new THREE.Vector3());world.y=b.max.y;
+ d.anchor=group.worldToLocal(world);
+}
+
+const bounds=new THREE.Box3().setFromObject(objectRoot);
+const center=bounds.getCenter(new THREE.Vector3());objectRoot.position.sub(center);
+const sphere=bounds.getBoundingSphere(new THREE.Sphere());const radius=Math.max(.55,sphere.radius);
+const flowMarkers=MODEL.stages.map(s=>{
+ if(!s.path)return null;
+ if(!Array.isArray(s.path)||s.path.length<2||s.path.some(p=>!Array.isArray(p)||p.length!==3))throw new Error('Invalid demonstration path: '+s.part);
+ const curve=new THREE.CatmullRomCurve3(s.path.map(p=>new THREE.Vector3(...p)));
+ const color=s.pathColor||0xffc86c;
+ const route=new THREE.Mesh(new THREE.TubeGeometry(curve,48,radius*.008,8,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.7}));
+ const marker=new THREE.Mesh(new THREE.SphereGeometry(radius*.05,16,10),new THREE.MeshBasicMaterial({color}));
+ route.visible=false;marker.visible=false;objectRoot.add(route,marker);
+ return {curve,route,marker};
+});
+const initialDirection=new THREE.Vector3(1.25,.85,1.65).normalize();
+function fit(){
+ const narrow=Math.min(1,camera.aspect),half=Math.atan(Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*narrow);
+ const distance=radius/Math.max(.12,Math.sin(half))*1.16;
+ camera.position.copy(initialDirection).multiplyScalar(distance);orbit.target.set(0,0,0);
+ orbit.minDistance=radius*.3;orbit.maxDistance=radius*10;orbit.update();
+}
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)}
+new ResizeObserver(resize).observe(stage);resize();fit();
+
+let selected=null,disassembled=false,labelsOn=false,step=-1,down=null;
+const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
+renderer.domElement.addEventListener('pointerdown',event=>{down={x:event.clientX,y:event.clientY}});
+renderer.domElement.addEventListener('pointerup',event=>{
+ if(!down)return;
+ const moved=Math.hypot(event.clientX-down.x,event.clientY-down.y);down=null;
+ if(moved>7)return;
+ const r=renderer.domElement.getBoundingClientRect();pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);
+ raycaster.setFromCamera(pointer,camera);const hit=raycaster.intersectObjects(parts,true).find(h=>meshToPart.has(h.object));
+ if(hit)select(meshToPart.get(hit.object));
+});
+function select(group){
+ if(selected)selected.traverse(n=>{if(n.isMesh&&n.userData.originalMaterial){n.material.dispose();n.material=n.userData.originalMaterial;delete n.userData.originalMaterial}});
+ selected=group;if(!group)return;
+ group.traverse(n=>{if(n.isMesh&&n.material.emissive){n.userData.originalMaterial=n.material;n.material=n.material.clone();n.material.emissive.add(new THREE.Color(0x233b4c))}});
+ $('partName').textContent=group.userData.model.name;$('partInfo').textContent=group.userData.model.info;
+}
+function press(id,on){$(id).setAttribute('aria-pressed',String(on))}
+$('explode').onclick=()=>{disassembled=!disassembled;press('explode',disassembled);$('explode').textContent=disassembled?"Құрастыру":"Бөлшектеу"};
+$('toggleLabels').onclick=()=>{labelsOn=!labelsOn;press('toggleLabels',labelsOn);$('toggleLabels').textContent=labelsOn?"Атауларды жасыру":"Атауларды көрсету"};
+$('works').onclick=()=>{
+ const stages=MODEL.stages;
+ step=(step+1)%stages.length;const s=stages[step],group=parts.find(p=>p.userData.model.name===s.part);
+ flowMarkers.forEach((f,i)=>{if(f)f.route.visible=f.marker.visible=i===step});
+ if(group)select(group);$('partName').textContent=`Қалай жұмыс істейді? · ${step+1}/${stages.length}`;$('partInfo').textContent=s.text;
+};
+$('reset').onclick=()=>{step=-1;flowMarkers.forEach(f=>{if(f)f.route.visible=f.marker.visible=false});if(typeof MODEL.animateStage==='function')MODEL.animateStage({time:0,step:-1,parts,THREE});disassembled=false;labelsOn=false;press('explode',false);press('toggleLabels',false);$('explode').textContent="Бөлшектеу";$('toggleLabels').textContent="Атауларды көрсету";select(null);$('partName').textContent="Бөлікті таңдаңыз";$('partInfo').textContent="Модельдің бір бөлігін басыңыз. Тінтуірмен сүйреп айналдырыңыз, дөңгелегімен жақындатыңыз.";fit()};
+
+const used=[],clip=new THREE.Vector3();
+function updateLabels(){
+ const width=stage.clientWidth,height=stage.clientHeight;used.length=0;
+ scene.updateMatrixWorld(true);
+ for(const {group,tag,line} of tags){
+  tag.style.display='none';line.style.display='none';if(!labelsOn)continue;
+  const p=group.localToWorld(group.userData.model.anchor.clone());clip.copy(p).project(camera);
+  if(clip.z<0||clip.z>1||Math.abs(clip.x)>1||Math.abs(clip.y)>1)continue;
+  const toward=p.clone().sub(camera.position),distance=toward.length();
+  raycaster.set(camera.position,toward.normalize());
+  const blocker=raycaster.intersectObjects(parts,true).find(h=>meshToPart.has(h.object)&&meshToPart.get(h.object)!==group);
+  if(blocker&&blocker.distance<distance-.08)continue;
+  const x=(clip.x+1)*width/2,y=(1-clip.y)*height/2;
+  tag.style.display='block';tag.style.visibility='hidden';const tw=tag.offsetWidth,th=tag.offsetHeight;
+  const positions=[[x-tw/2,y-th-13],[x+12,y-th/2],[x-tw-12,y-th/2],[x-tw/2,y+12]];
+  const ok=positions.find(([px,py])=>px>4&&py>4&&px+tw<width-4&&py+th<height-4&&used.every(([ax,ay,aw,ah])=>px+tw+5<ax||ax+aw+5<px||py+th+5<ay||ay+ah+5<py));
+  if(!ok){tag.style.display='none';continue}
+  tag.style.left=ok[0]+'px';tag.style.top=ok[1]+'px';tag.style.visibility='visible';
+  used.push([ok[0],ok[1],tw,th]);line.style.display='block';
+  line.setAttribute('x1',x);line.setAttribute('y1',y);line.setAttribute('x2',ok[0]+tw/2);line.setAttribute('y2',ok[1]+th/2);
+ }
+}
+let clock=0;
+function frame(t){
+ requestAnimationFrame(frame);const dt=Math.min(.05,(t-clock)/1000||0);clock=t;
+ for(const group of parts){const d=group.userData.model,target=d.base.clone().addScaledVector(d.explode,disassembled?1:0);group.position.lerp(target,Math.min(1,dt*9))}
+ if(step>=0&&typeof MODEL.animateStage==='function')MODEL.animateStage({time:t/1000,step,parts,THREE});
+ if(step>=0&&flowMarkers[step])flowMarkers[step].marker.position.copy(flowMarkers[step].curve.getPointAt((t*.00035)%1));
+ orbit.update();updateLabels();renderer.render(scene,camera);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
