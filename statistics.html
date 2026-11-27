@@ -48,8 +48,8 @@
     }
     .stats-legend li { display: flex; align-items: center; gap: .45rem; font-weight: 750; }
     .stats-legend-marker { width: .85rem; height: .85rem; border-radius: .25rem; background: var(--series); }
-    .activation-series { --series: #b64700; }
-    .usage-series { --series: #005ca9; }
+    .activation-series { --series: #fa7864; }
+    .usage-series { --series: #6489fa; }
     .regional-chart {
       --region-column: clamp(10rem, 20vw, 16rem);
       min-width: 0;
@@ -95,14 +95,14 @@
       right: .45rem;
       top: 50%;
       transform: translateY(-50%);
-      color: #fff;
+      color: #17203a;
       white-space: nowrap;
       font-size: .8rem;
       font-weight: 800;
       font-variant-numeric: tabular-nums;
     }
     @container bar (max-width: 3.75rem) {
-      .chart-value { right: auto; left: calc(100% + .35rem); color: var(--series); }
+      .chart-value { right: auto; left: calc(100% + .35rem); }
     }
     @media (max-width: 660px) {
       .chart-axis, .chart-region { grid-template-columns: minmax(0, 1fr); gap: .35rem; }
